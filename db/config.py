@@ -2,7 +2,7 @@ from functools import lru_cache
 
 from sqlalchemy import create_engine
 
-url = 'sqlite:////_sqlite.db'
+url = 'sqlite:////hafa_data.db'
 
 
 @lru_cache(maxsize=32)

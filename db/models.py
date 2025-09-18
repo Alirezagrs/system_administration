@@ -1,0 +1,82 @@
+from datetime import date as _date, time
+
+from sqlalchemy import String, ForeignKey, Date, Time, Boolean
+from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, \
+    MappedAsDataclass
+
+
+class Base(DeclarativeBase):
+    pass
+
+class Users(Base):
+    "those who work with software"
+    __tablename__ = "users"
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    name: Mapped[str] = mapped_column(String(30))
+    password: Mapped[str] = mapped_column(String(128), nullable=False)
+    
+
+
+class Employees(MappedAsDataclass, Base):
+    __tablename__ = "employees"
+
+    id: Mapped[int] = mapped_column(
+        primary_key=True, autoincrement=True, init=False
+    )
+    first_name: Mapped[str] = mapped_column(String(30))
+    last_name: Mapped[str] = mapped_column(String(30))
+    badge: Mapped[str] = mapped_column(String(50))
+    # foreignkey + unique = one to one relation
+    info_id: Mapped[int] = mapped_column(
+        ForeignKey("employee_info.id", ondelete="CASCADE",),
+        unique=True
+    )
+
+
+class EInfo(Base):
+    __tablename__ = "employee_info"
+
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    date: Mapped[_date] = mapped_column(Date)
+    entrance_time: Mapped[time] = mapped_column(Time)
+    exit_time: Mapped[time] = mapped_column(Time)
+    is_released: Mapped[bool] = mapped_column(Boolean, default=False)
+    reseaon_of_releasing: Mapped[str] = mapped_column()
+    mission_kind: Mapped[str] = mapped_column()
+    mission_tiem: Mapped[time] = mapped_column(Time)
+    overtime_work: Mapped[time] = mapped_column(Time)
+
+
+class Customers(Base):
+    __tablename__ = "customers"
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    first_name: Mapped[str] = mapped_column(String(30))
+    last_name: Mapped[str] = mapped_column(String(30))
+    date: Mapped[_date] = mapped_column(Date)
+    entrance_time: Mapped[time] = mapped_column(Time)
+    exit_time: Mapped[time] = mapped_column(Time)
+    work_with: Mapped[int] = mapped_column(
+        ForeignKey("employees.id", ondelete="CASCADE")
+        )
+
+
+class MilitaryGuy(Base):
+    __tablename__ = "military_guys"
+    id: Mapped[int] = mapped_column(
+        ForeignKey("customers.id", ondelete="CASCADE",),
+        unique=True,
+        primary_key=True
+    )
+    badg: Mapped[str] = mapped_column(String(50))
+    organization: Mapped[str] = mapped_column(String(50))
+    gender: Mapped[str] = mapped_column(String(15))
+
+
+class NormalGuy(Base):
+    __tablename__ = "normal_guys"
+    id: Mapped[int] = mapped_column(
+        ForeignKey("customers.id", ondelete="CASCADE"),
+        unique=True,
+        primary_key=True
+    )
+    gender: Mapped[str] = mapped_column(String(15))
