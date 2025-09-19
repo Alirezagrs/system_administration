@@ -1,9 +1,6 @@
-import os
-from pathlib import Path
-
 from PyQt6.QtWidgets import QMainWindow, QLabel, QLineEdit, \
-    QPushButton, QMessageBox, QFrame
-from PyQt6.QtGui import QFont
+    QPushButton, QMessageBox, QFrame, QCheckBox
+
 from sqlalchemy import select
 
 from db.config import create_session
@@ -21,11 +18,13 @@ class LoginWindow(QMainWindow):
         self.setFixedSize(1280, 735)
         self.setStyleSheet("background-color: #4070f4;")
 
+        # Frame
         self.frame = QFrame(self)
         self.frame.setStyleSheet(
             "background-color: #fff; border: 2px solid white; border-radius: 10px")
-        self.frame.setGeometry(400, 100, 500, 550)
+        self.frame.setGeometry(400, 100, 500, 475)
 
+        # Login Label
         self.login_label = QLabel(self.frame)
         self.login_label.setText("صفحه ورود")
         self.login_label.move(185,20)
@@ -38,6 +37,7 @@ class LoginWindow(QMainWindow):
 
     """)
 
+        # Inputs
         self.name_input = QLineEdit(self.frame)
         self.password_input = QLineEdit(self.frame)
         self.name_input.setStyleSheet("""
@@ -65,6 +65,19 @@ class LoginWindow(QMainWindow):
         self.password_input.move(50, 223)
         self.password_input.setEchoMode(QLineEdit.EchoMode.Password)
 
+        #check box
+        self.check_box = QCheckBox(self.frame)
+        self.check_box.setText("نمایش رمز عبور")
+        self.check_box.setStyleSheet("""
+            QCheckBox{
+                font-size: 14px;
+                color: #2c3e50;        
+            }
+    """)
+        self.check_box.move(340,280)
+        self.check_box.toggled.connect(self.is_checked_checkbox)
+
+        # Login button
         self.login_btn = QPushButton(text="ورود", parent=self.frame)
         self.login_btn.setStyleSheet("""
             QPushButton{
@@ -78,7 +91,7 @@ class LoginWindow(QMainWindow):
             }
                                      
             QPushButton:hover {
-                background-color: #016dcb;
+                background-color: #112cf7;
                 
             }
     """)
@@ -104,3 +117,10 @@ class LoginWindow(QMainWindow):
                 print(e)
                 QMessageBox.information(
                     self.frame, "خطا", "نام یا رمز عبور اشتباه است")
+    
+    def is_checked_checkbox(self, checked):
+        if checked:
+            self.password_input.setEchoMode(QLineEdit.EchoMode.Normal)
+        else:
+            self.password_input.setEchoMode(QLineEdit.EchoMode.Password)
+
