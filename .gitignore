@@ -1,8 +1,6 @@
 venv
 *.db
 sqlite
-alembic
-alembic.ini
 alembic# Created by https://www.toptal.com/developers/gitignore/api/visualstudiocode,python,venv,git,qt
 # Edit at https://www.toptal.com/developers/gitignore?templates=visualstudiocode,python,venv,git,qt
 

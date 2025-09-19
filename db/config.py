@@ -1,6 +1,7 @@
 from functools import lru_cache
 
 from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker, Session
 
 url = 'sqlite:////hafa_data.db'
 
@@ -9,3 +10,10 @@ url = 'sqlite:////hafa_data.db'
 def engine():
     _engine = create_engine(url=url)
     return _engine
+
+
+def create_session() -> Session:
+    session = sessionmaker(
+        bind=engine(), autoflush=False, expire_on_commit=False
+        )
+    return session()

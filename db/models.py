@@ -1,5 +1,6 @@
 from datetime import date as _date, time
 
+import bcrypt
 from sqlalchemy import String, ForeignKey, Date, Time, Boolean
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, \
     MappedAsDataclass
@@ -8,13 +9,26 @@ from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, \
 class Base(DeclarativeBase):
     pass
 
+
 class Users(Base):
     "those who work with software"
     __tablename__ = "users"
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     name: Mapped[str] = mapped_column(String(30))
     password: Mapped[str] = mapped_column(String(128), nullable=False)
-    
+    is_superuser: Mapped[bool] = mapped_column(Boolean, default=False)
+
+    # loke django
+    def set_password(self, password):
+        self.hashed_password = bcrypt.hashpw(
+            password.encode("utf-8"), bcrypt.gensalt()
+        ).decode()
+        return self.hashed_password
+
+    def check_password(self, password):
+        return bcrypt.checkpw(
+            password.encode("utf-8"), self.hashed_password.encode("utf-8")
+        )
 
 
 class Employees(MappedAsDataclass, Base):
@@ -43,7 +57,7 @@ class EInfo(Base):
     is_released: Mapped[bool] = mapped_column(Boolean, default=False)
     reseaon_of_releasing: Mapped[str] = mapped_column()
     mission_kind: Mapped[str] = mapped_column()
-    mission_tiem: Mapped[time] = mapped_column(Time)
+    mission_time: Mapped[time] = mapped_column(Time)
     overtime_work: Mapped[time] = mapped_column(Time)
 
 
@@ -57,14 +71,13 @@ class Customers(Base):
     exit_time: Mapped[time] = mapped_column(Time)
     work_with: Mapped[int] = mapped_column(
         ForeignKey("employees.id", ondelete="CASCADE")
-        )
+    )
 
 
 class MilitaryGuy(Base):
     __tablename__ = "military_guys"
     id: Mapped[int] = mapped_column(
         ForeignKey("customers.id", ondelete="CASCADE",),
-        unique=True,
         primary_key=True
     )
     badg: Mapped[str] = mapped_column(String(50))
@@ -76,7 +89,6 @@ class NormalGuy(Base):
     __tablename__ = "normal_guys"
     id: Mapped[int] = mapped_column(
         ForeignKey("customers.id", ondelete="CASCADE"),
-        unique=True,
         primary_key=True
     )
     gender: Mapped[str] = mapped_column(String(15))
