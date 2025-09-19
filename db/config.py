@@ -3,7 +3,7 @@ from functools import lru_cache
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, Session
 
-url = 'sqlite:////hafa_data.db'
+url = 'sqlite:///hefa_data.db'
 
 
 @lru_cache(maxsize=32)

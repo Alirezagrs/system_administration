@@ -12,6 +12,7 @@ def create_user(name, password):
         if_user_exists = session.execute(if_user_exists)
         result = if_user_exists.scalar_one_or_none()
 
+
         if not result:
                 user = Users(
                     name=name
@@ -19,7 +20,7 @@ def create_user(name, password):
                 if user.name =="morteza":
                     user = Users(
                          name=name,
-                         password=user.set_password(password),
+                         password=password,
                          is_superuser = False
                     )
                     session.add(user)
@@ -27,11 +28,8 @@ def create_user(name, password):
 
                 else:
                     user = Users(
-                        name=name
-                    )
-                    user = Users(
                          name=name,
-                         password=user.set_password(password),
+                         password=password,
                          is_superuser = True
                         )
                     session.add(user)

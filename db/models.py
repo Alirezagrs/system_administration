@@ -1,6 +1,5 @@
 from datetime import date as _date, time
 
-import bcrypt
 from sqlalchemy import String, ForeignKey, Date, Time, Boolean
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, \
     MappedAsDataclass
@@ -17,19 +16,7 @@ class Users(Base):
     name: Mapped[str] = mapped_column(String(30))
     password: Mapped[str] = mapped_column(String(128), nullable=False)
     is_superuser: Mapped[bool] = mapped_column(Boolean, default=False)
-
-    # loke django
-    def set_password(self, password):
-        self.hashed_password = bcrypt.hashpw(
-            password.encode("utf-8"), bcrypt.gensalt()
-        ).decode()
-        return self.hashed_password
-
-    def check_password(self, password):
-        return bcrypt.checkpw(
-            password.encode("utf-8"), self.hashed_password.encode("utf-8")
-        )
-
+    
 
 class Employees(MappedAsDataclass, Base):
     __tablename__ = "employees"
