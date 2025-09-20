@@ -111,7 +111,7 @@ class LoginWindow(QMainWindow):
 
             try:
                 if result:
-                    self.manage_window = ManageWindow()
+                    self.manage_window = ManageWindow(user_name=result.name)
                     self.close()
                 else:
                     QMessageBox.information(

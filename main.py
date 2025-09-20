@@ -2,19 +2,19 @@ import sys
 
 from PyQt6.QtWidgets import QApplication
 
-from src.login_window import ManageWindow
+from src.login_window import ManageWindow, LoginWindow
 
-# from services.insert_users import create_user
+from services.insert_users import create_user
 
 def starter():
-    # create_user('morteza',"aa123aa")
-    # create_user('admin', "Admin321A")
+    create_user('soldier',"aa123aa")
+    create_user('admin', "Admin321A")
 
     app = QApplication(sys.argv)
     # ref count if you do not a variable like window to the ref count is 0
     # so python after ending the program cleans those with ref_count=0
     # it causes the window comes up and then be broken out of the blue
-    window = ManageWindow()
+    window = LoginWindow()
     sys.exit(app.exec())
 
 if __name__ == "__main__":
