@@ -2,8 +2,8 @@ import sys
 
 from PyQt6.QtWidgets import QApplication
 
-from src import manage_window
-from src.manage_window import ManageWindow
+from src.login_window import ManageWindow
+
 # from services.insert_users import create_user
 
 def starter():
