@@ -1,10 +1,11 @@
 from PyQt6.QtWidgets import QMainWindow, QLabel, QLineEdit, \
     QPushButton, QMessageBox, QFrame, QCheckBox
-
+from PyQt6.QtCore import Qt
 from sqlalchemy import select
 
 from db.config import create_session
 from db.models import Users
+from src.manage_window import ManageWindow
 
 
 class LoginWindow(QMainWindow):
@@ -27,7 +28,7 @@ class LoginWindow(QMainWindow):
         # Login Label
         self.login_label = QLabel(self.frame)
         self.login_label.setText("صفحه ورود")
-        self.login_label.move(185,20)
+        self.login_label.move(185, 20)
         self.login_label.setStyleSheet("""
             QLabel{
                 color: #313333;
@@ -65,7 +66,7 @@ class LoginWindow(QMainWindow):
         self.password_input.move(50, 223)
         self.password_input.setEchoMode(QLineEdit.EchoMode.Password)
 
-        #check box
+        # check box
         self.check_box = QCheckBox(self.frame)
         self.check_box.setText("نمایش رمز عبور")
         self.check_box.setStyleSheet("""
@@ -74,11 +75,12 @@ class LoginWindow(QMainWindow):
                 color: #2c3e50;        
             }
     """)
-        self.check_box.move(340,280)
+        self.check_box.move(340, 280)
         self.check_box.toggled.connect(self.is_checked_checkbox)
 
         # Login button
         self.login_btn = QPushButton(text="ورود", parent=self.frame)
+        self.login_btn.setCursor(Qt.CursorShape.PointingHandCursor)
         self.login_btn.setStyleSheet("""
             QPushButton{
                 color: #fff;
@@ -109,18 +111,17 @@ class LoginWindow(QMainWindow):
 
             try:
                 if result:
+                    self.manage_window = ManageWindow()
                     self.close()
                 else:
                     QMessageBox.information(
                         self.frame, "خطا", "نام یا رمز عبور اشتباه است")
-            except Exception as e:
-                print(e)
+            except:
                 QMessageBox.information(
                     self.frame, "خطا", "نام یا رمز عبور اشتباه است")
-    
+
     def is_checked_checkbox(self, checked):
         if checked:
             self.password_input.setEchoMode(QLineEdit.EchoMode.Normal)
         else:
             self.password_input.setEchoMode(QLineEdit.EchoMode.Password)
-
