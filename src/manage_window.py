@@ -33,7 +33,8 @@ class ManageWindow(QMainWindow):
         self.hsidebar_label.setFont(self._font)
 
         self.hsidebar_mention = QLabel(
-            f"ذکر امروز {find_mention_of_the_day()}")
+            f"ذکر امروز {find_mention_of_the_day()}"
+        )
         self.hsidebar_mention.setFont(self._font)
 
         self.hsidebar_title = QLabel("سیستم ورود و خروج 👮")
@@ -72,10 +73,11 @@ class ManageWindow(QMainWindow):
         if self.user_name == "admin":
             boss_btn = self.make_vsidebar_btns(f"{self.user_name} :مدیر سیستم", "👨‍💼")
             sidebar_layout.addWidget(boss_btn)
+
         elif self.user_name == "soldier":
             soldier_btn = self.make_vsidebar_btns(f"{self.user_name} :کاربر سیستم", "👨‍💼")
             sidebar_layout.addWidget(soldier_btn)
-            
+
         sidebar_layout.addWidget(enter_e_btn)
         sidebar_layout.addWidget(enter_g_btn)
         sidebar_layout.addWidget(info_btn)
@@ -104,6 +106,8 @@ class ManageWindow(QMainWindow):
     # vsidebar_btns
     def make_vsidebar_btns(self, text, icon):
         self.btn = QPushButton(f"{icon} {text}")
+        if "admin" in text or "soldier" in text:
+            self.btn.setDisabled(True)
         self.btn.setFont(self._font)
         self.btn.setCursor(Qt.CursorShape.PointingHandCursor)
         self.btn.setStyleSheet("""
@@ -127,4 +131,6 @@ class ManageWindow(QMainWindow):
 
     # btn_actions
     def close_program(self):
+        from src.login_window import LoginWindow # for circular import
+        self.login_window = LoginWindow()
         self.close()
