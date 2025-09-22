@@ -1,6 +1,6 @@
 from datetime import date as _date, time
 
-from sqlalchemy import String, ForeignKey, Date, Time, Boolean
+from sqlalchemy import String, ForeignKey, Date, Time, Boolean, Float
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, \
     MappedAsDataclass
 
@@ -42,10 +42,10 @@ class EInfo(Base):
     entrance_time: Mapped[time] = mapped_column(Time)
     exit_time: Mapped[time] = mapped_column(Time)
     is_released: Mapped[bool] = mapped_column(Boolean, default=False)
-    reseaon_of_releasing: Mapped[str] = mapped_column()
-    mission_kind: Mapped[str] = mapped_column()
-    mission_time: Mapped[time] = mapped_column(Time)
-    overtime_work: Mapped[time] = mapped_column(Time)
+    reseaon_of_releasing: Mapped[str] = mapped_column(nullable=True)
+    mission_kind: Mapped[str] = mapped_column(nullable=True)
+    mission_time: Mapped[time] = mapped_column(Time, nullable=True)
+    overtime_work: Mapped[float] = mapped_column(nullable=True)
 
 
 class Customers(Base):

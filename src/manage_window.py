@@ -1,9 +1,9 @@
 from PyQt6.QtWidgets import QMainWindow, QLabel, QTableWidget, \
     QPushButton, QHBoxLayout, QFrame, QVBoxLayout, QWidget, QDateEdit
-from PyQt6.QtCore import Qt, QDate
+from PyQt6.QtCore import Qt, QDate, QLocale
 from PyQt6.QtGui import QFont
 
-from utils.persian_datetime import persian_date
+from utils.persian_datetime import persian_date, convert_calender_to_persian as cp
 from utils.mention_of_day import find_mention_of_the_day
 
 
@@ -52,13 +52,84 @@ class ManageWindow(QMainWindow):
         # date
         self.date_edit = QDateEdit()
         self.date_edit.setFixedHeight(20)
-        self.date_edit.setDate(QDate.currentDate())   # تاریخ امروز
-        self.date_edit.setCalendarPopup(True)         # باز شدن popup تقویم
-        self.date_edit.setDisplayFormat("yyyy/MM/dd")  # فرمت نمایش
+        self.date_edit.setDate(QDate(cp().year, cp().month, cp().day)) 
+        self.date_edit.setLocale(QLocale(QLocale.Language.Persian, QLocale.Country.Iran))
+        self.date_edit.setCalendarPopup(True)         
+        self.date_edit.setDisplayFormat("yyyy/MM/dd")  
+        self.date_edit.setStyleSheet("""
+            QDateEdit {
+                background-color: white;
+                border: 1px solid #ccc;
+                padding: 2px 4px;
+            }
+            QCalendarWidget QWidget {
+                alternate-background-color: #f5f5f5;
+            }
+            QCalendarWidget QToolButton{
+                color: #fff;
+                background-color: #090a0f;
+                font-weight: bold;
+                border: none;
+                border-radius: 4px;
+                padding: 2px;
+            }
+            QCalendarWidget QToolButton:hover {
+                background-color: #454647;
+            }
+            QCalendarWidget QSpinBox{
+                color: black;
+                background: white;
+                selection-background-color: #03040a;
+            }
+            QCalendarWidget QAbstractItemView:enabled{
+                color: black;
+                selection-background-color: #cce5ff;
+                selection-color: black;
+            }
+    """)
+
 
         #table
-        self.table = QTableWidget(5,2)
-        self.table.setHorizontalHeaderLabels(['name', 'age'])
+        self.table = QTableWidget(11,11)
+        self.table.setHorizontalHeaderLabels(
+            [
+                'نام', 
+                'نام خانوادگی',
+                'درجه',
+                'تاریخ',
+                'زمان ورود',
+                'زمان خروج',
+                'مرخصی',
+                'دلیل مرخصی',
+                'نوع ماموریت',
+                'زمان ماموریت',
+                'اضافه کاری',
+                ]
+            )
+        self.table.setStyleSheet("""
+            QTableWidget {
+                background-color: #ffffff;
+                alternate-background-color: #f9f9f9;
+                gridline-color: #dcdcdc;         
+                font-size: 12px;
+                border: 1px solid #dcdcdc;
+            }
+            QHeaderView::section {
+                background-color: #998d8d;       
+                color: white;                   
+                font-weight: bold;
+                font-size: 13px;
+                padding: 5px;
+                border: none;
+            }
+            QTableWidget::item {
+                padding: 4px;
+            }
+            QTableWidget::item:selected {
+                background-color: #cce5ff;   
+                color: #000;
+            }
+    """)
 
         # hsidebar_label
         self.hsidebar_label = QLabel(f"امروز {persian_date()}")
