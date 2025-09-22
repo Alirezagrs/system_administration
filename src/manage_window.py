@@ -1,6 +1,7 @@
+from poplib import LF
 from PyQt6.QtWidgets import QMainWindow, QLabel, QTableWidget, \
     QPushButton, QHBoxLayout, QFrame, QVBoxLayout, QWidget, QDateEdit
-from PyQt6.QtCore import Qt, QDate, QLocale
+from PyQt6.QtCore import Qt, QDate, QLocale, QCalendar
 from PyQt6.QtGui import QFont
 
 from utils.persian_datetime import persian_date, convert_calender_to_persian as cp
@@ -42,20 +43,46 @@ class ManageWindow(QMainWindow):
         # table frame
         self.table_frame = QFrame()
         self.table_frame.setStyleSheet("background-color: #f5f5f5;")
-        
+
         # main-frame
         self.content = QFrame()
         self.content.setStyleSheet("background-color: #f5f5f5;")
 
         # __________________widgets___________________
-
+        # search date in db btn
+        self.search_btn = QPushButton()
+        self.search_btn.setFont(self._font)
+        self.search_btn.setCursor(Qt.CursorShape.PointingHandCursor)
+        self.search_btn.setFixedHeight(25)
+        self.search_btn.setText("جست و جو")
+        self.search_btn.setStyleSheet("""
+        QPushButton{
+            background: #07b813;
+            color: white;
+            font-size: 12px;
+        }
+        QPushButton:hover{
+            background: #09e818;
+            color: white;
+            font-size: 12px;
+        }
+    """)
         # date
         self.date_edit = QDateEdit()
         self.date_edit.setFixedHeight(20)
-        self.date_edit.setDate(QDate(cp().year, cp().month, cp().day)) 
-        self.date_edit.setLocale(QLocale(QLocale.Language.Persian, QLocale.Country.Iran))
-        self.date_edit.setCalendarPopup(True)         
-        self.date_edit.setDisplayFormat("yyyy/MM/dd")  
+        self.date_edit.setDate(
+            QDate(
+                cp().year,
+                cp().month,
+                cp().day,
+                QCalendar(QCalendar.System.Jalali)
+            )
+        )
+        self.date_edit.setCalendar(QCalendar(QCalendar.System.Jalali))
+        self.date_edit.setLocale(
+            QLocale(QLocale.Language.Persian, QLocale.Country.Iran))
+        self.date_edit.setCalendarPopup(True)
+        self.date_edit.setDisplayFormat("yyyy/MM/dd")
         self.date_edit.setStyleSheet("""
             QDateEdit {
                 background-color: white;
@@ -86,14 +113,23 @@ class ManageWindow(QMainWindow):
                 selection-background-color: #cce5ff;
                 selection-color: black;
             }
+            QCalendarWidget QMenu {
+                background-color: #fff;
+                color: black;   
+                border: 1px solid #ccc;
+            }
+            QCalendarWidget QMenu::item:selected {
+                background-color: #e0e0e0;   
+                color: black;
+            }
     """)
 
-
-        #table
-        self.table = QTableWidget(11,11)
+        # table
+        self.table = QTableWidget(6, 11)
+        self.table.setLayoutDirection(Qt.LayoutDirection.RightToLeft)
         self.table.setHorizontalHeaderLabels(
             [
-                'نام', 
+                'نام',
                 'نام خانوادگی',
                 'درجه',
                 'تاریخ',
@@ -104,18 +140,19 @@ class ManageWindow(QMainWindow):
                 'نوع ماموریت',
                 'زمان ماموریت',
                 'اضافه کاری',
-                ]
-            )
+            ]
+        )
         self.table.setStyleSheet("""
             QTableWidget {
-                background-color: #ffffff;
+                background-color: #faf5f5;
                 alternate-background-color: #f9f9f9;
-                gridline-color: #dcdcdc;         
-                font-size: 12px;
-                border: 1px solid #dcdcdc;
+                gridline-color: #080707;       
+                font-size: 14px;
+                font-weight: bold;
+                border: 2px solid #fff;
             }
             QHeaderView::section {
-                background-color: #998d8d;       
+                background-color: #474141;       
                 color: white;                   
                 font-weight: bold;
                 font-size: 13px;
@@ -124,10 +161,12 @@ class ManageWindow(QMainWindow):
             }
             QTableWidget::item {
                 padding: 4px;
+                font-weight: bold;
             }
             QTableWidget::item:selected {
                 background-color: #cce5ff;   
                 color: #000;
+                font-weight: bold;
             }
     """)
 
@@ -150,6 +189,7 @@ class ManageWindow(QMainWindow):
 
         # vsidebar_btn
         self.enter_e_btn = self.make_vsidebar_btns("ورود و خروج کارکنان", "💼")
+        self.enter_e_btn.setEnabled(True)
         self.enter_g_btn = self.make_vsidebar_btns("ورود و خروج اشخاص", "🕘")
         self.info_btn = self.make_vsidebar_btns("گزارشات", "📊")
         self.settings_btn = self.make_vsidebar_btns("تنظیمات", "⚙️")
@@ -188,7 +228,9 @@ class ManageWindow(QMainWindow):
         # date layout
         self.container_hlayout_date = QHBoxLayout()
         self.container_hlayout_date.addStretch()
-        self.container_hlayout_date.addWidget(self.date_edit, alignment=Qt.AlignmentFlag.AlignTop | Qt.AlignmentFlag.AlignRight)
+        self.container_hlayout_date.addWidget(self.search_btn)
+        self.container_hlayout_date.addWidget(
+            self.date_edit, alignment=Qt.AlignmentFlag.AlignTop | Qt.AlignmentFlag.AlignRight)
         self.date_frame.setLayout(self.container_hlayout_date)
 
         # table layout
@@ -202,7 +244,6 @@ class ManageWindow(QMainWindow):
         self.content_layout.addWidget(self.table_frame, stretch=1)
         self.content_layout.addStretch()
         self.content.setLayout(self.content_layout)
-        
 
         body_layout = QHBoxLayout()
         body_layout.addWidget(self.vsidebar)   # سایدبار سمت چپ
@@ -237,7 +278,7 @@ class ManageWindow(QMainWindow):
                     font-weight: bold;
                     background: transparent;
             }
-            QPushButton:checked{
+            QPushButton:selected{
                     background: #4358f0; 
             }
             QPushButton:hover{ 
