@@ -1,6 +1,6 @@
-from PyQt6.QtWidgets import QMainWindow, QLabel, QLineEdit, \
-    QPushButton, QHBoxLayout, QFrame, QCheckBox, QVBoxLayout, QWidget
-from PyQt6.QtCore import Qt
+from PyQt6.QtWidgets import QMainWindow, QLabel, QTableWidget, \
+    QPushButton, QHBoxLayout, QFrame, QVBoxLayout, QWidget, QDateEdit
+from PyQt6.QtCore import Qt, QDate
 from PyQt6.QtGui import QFont
 
 from utils.persian_datetime import persian_date
@@ -23,10 +23,42 @@ class ManageWindow(QMainWindow):
         # font
         self._font = QFont("B Titr", 12)
 
+        # __________________frames____________________
         # hsidebar_frame
         self.hsidebar = QFrame()
         self.hsidebar.setStyleSheet("background-color: #f7f5f5;")
         self.hsidebar.setFixedHeight(50)
+
+        # vsidebar_frame
+        self.vsidebar = QFrame()
+        self.vsidebar.setStyleSheet("background-color: #474141;")
+        self.vsidebar.setFixedWidth(200)
+
+        # date frame
+        self.date_frame = QFrame()
+        self.date_frame.setStyleSheet("background-color: #f5f5f5;")
+        self.date_frame.setFixedHeight(30)
+
+        # table frame
+        self.table_frame = QFrame()
+        self.table_frame.setStyleSheet("background-color: #f5f5f5;")
+        
+        # main-frame
+        self.content = QFrame()
+        self.content.setStyleSheet("background-color: #f5f5f5;")
+
+        # __________________widgets___________________
+
+        # date
+        self.date_edit = QDateEdit()
+        self.date_edit.setFixedHeight(20)
+        self.date_edit.setDate(QDate.currentDate())   # تاریخ امروز
+        self.date_edit.setCalendarPopup(True)         # باز شدن popup تقویم
+        self.date_edit.setDisplayFormat("yyyy/MM/dd")  # فرمت نمایش
+
+        #table
+        self.table = QTableWidget(5,2)
+        self.table.setHorizontalHeaderLabels(['name', 'age'])
 
         # hsidebar_label
         self.hsidebar_label = QLabel(f"امروز {persian_date()}")
@@ -44,6 +76,15 @@ class ManageWindow(QMainWindow):
             font-weight: bold;
             font-size: 20px
         """)
+
+        # vsidebar_btn
+        self.enter_e_btn = self.make_vsidebar_btns("ورود و خروج کارکنان", "💼")
+        self.enter_g_btn = self.make_vsidebar_btns("ورود و خروج اشخاص", "🕘")
+        self.info_btn = self.make_vsidebar_btns("گزارشات", "📊")
+        self.settings_btn = self.make_vsidebar_btns("تنظیمات", "⚙️")
+        self.exit_btn = self.make_vsidebar_btns("خروج", "")
+
+        # __________________layout____________________
         # hsidebar_layout
         hlayout = QHBoxLayout()
         hlayout.addWidget(self.hsidebar_mention)
@@ -53,46 +94,48 @@ class ManageWindow(QMainWindow):
         hlayout.addWidget(self.hsidebar_label)
         self.hsidebar.setLayout(hlayout)
 
-        # vsidebar_frame
-        self.vsidebar = QFrame()
-        self.vsidebar.setStyleSheet("background-color: #474141;")
-        self.vsidebar.setFixedWidth(200)
-
-        # vsidebar_btn
-        enter_e_btn = self.make_vsidebar_btns("ورود و خروج کارکنان", "💼")
-        enter_g_btn = self.make_vsidebar_btns("ورود و خروج اشخاص", "🕘")
-        info_btn = self.make_vsidebar_btns("گزارشات", "📊")
-        settings_btn = self.make_vsidebar_btns("تنظیمات", "⚙️")
-        exit_btn = self.make_vsidebar_btns("خروج", "")
-
-        # btn actions
-        exit_btn.clicked.connect(self.close_program)
-
         # vsidebar_layout
         sidebar_layout = QVBoxLayout()
         if self.user_name == "admin":
-            boss_btn = self.make_vsidebar_btns(f"{self.user_name} :مدیر سیستم", "👨‍💼")
+            boss_btn = self.make_vsidebar_btns(
+                f"{self.user_name} :مدیر سیستم", "👨‍💼")
             sidebar_layout.addWidget(boss_btn)
 
         elif self.user_name == "soldier":
-            soldier_btn = self.make_vsidebar_btns(f"{self.user_name} :کاربر سیستم", "👨‍💼")
+            soldier_btn = self.make_vsidebar_btns(
+                f"{self.user_name} :کاربر سیستم", "👨‍💼")
             sidebar_layout.addWidget(soldier_btn)
 
-        sidebar_layout.addWidget(enter_e_btn)
-        sidebar_layout.addWidget(enter_g_btn)
-        sidebar_layout.addWidget(info_btn)
-        sidebar_layout.addWidget(settings_btn)
+        sidebar_layout.addWidget(self.enter_e_btn)
+        sidebar_layout.addWidget(self.enter_g_btn)
+        sidebar_layout.addWidget(self.info_btn)
+        sidebar_layout.addWidget(self.settings_btn)
         sidebar_layout.addStretch()
-        sidebar_layout.addWidget(exit_btn)
+        sidebar_layout.addWidget(self.exit_btn)
         self.vsidebar.setLayout(sidebar_layout)
 
-        # middle_frame_right
-        self.content = QFrame()
-        self.content.setStyleSheet("background-color: #f5f5f5;")
+        # date layout
+        self.container_hlayout_date = QHBoxLayout()
+        self.container_hlayout_date.addStretch()
+        self.container_hlayout_date.addWidget(self.date_edit, alignment=Qt.AlignmentFlag.AlignTop | Qt.AlignmentFlag.AlignRight)
+        self.date_frame.setLayout(self.container_hlayout_date)
+
+        # table layout
+        self.container_hlayout_table = QHBoxLayout()
+        self.container_hlayout_table.addWidget(self.table)
+        self.table_frame.setLayout(self.container_hlayout_table)
+
+        # layout of date and table
+        self.content_layout = QVBoxLayout()
+        self.content_layout.addWidget(self.date_frame)
+        self.content_layout.addWidget(self.table_frame, stretch=1)
+        self.content_layout.addStretch()
+        self.content.setLayout(self.content_layout)
+        
 
         body_layout = QHBoxLayout()
         body_layout.addWidget(self.vsidebar)   # سایدبار سمت چپ
-        body_layout.addWidget(self.content)    # محتوای اصلی
+        body_layout.addWidget(self.content)  # محتوای اصلی
 
         # --- لایه نهایی (header + body)
         main_layout = QVBoxLayout()
@@ -103,7 +146,10 @@ class ManageWindow(QMainWindow):
         container.setLayout(main_layout)
         self.setCentralWidget(container)  # special when using layout
 
-    # vsidebar_btns
+        # __________________actions__________________
+        self.exit_btn.clicked.connect(self.close_program)
+
+    # __________________utils__________________
     def make_vsidebar_btns(self, text, icon):
         self.btn = QPushButton(f"{icon} {text}")
         if "admin" in text or "soldier" in text:
@@ -129,8 +175,7 @@ class ManageWindow(QMainWindow):
         """)
         return self.btn
 
-    # btn_actions
     def close_program(self):
-        from src.login_window import LoginWindow # for circular import
+        from src.login_window import LoginWindow  # for circular import
         self.login_window = LoginWindow()
         self.close()
