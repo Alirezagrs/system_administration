@@ -4,7 +4,7 @@ from PyQt6.QtWidgets import QApplication
 
 from src.login_window import ManageWindow, LoginWindow
 
-from services.insert_users import create_user
+from services.users_employees_operations import create_user
 
 def starter():
     create_user('soldier',"aa123aa")

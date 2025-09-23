@@ -1,8 +1,8 @@
 """empty message
 
-Revision ID: ed8e47fc0750
+Revision ID: 011a0218fb31
 Revises: 
-Create Date: 2025-09-19 04:58:07.324805
+Create Date: 2025-09-23 15:15:06.887171
 
 """
 from typing import Sequence, Union
@@ -12,7 +12,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision: str = 'ed8e47fc0750'
+revision: str = '011a0218fb31'
 down_revision: Union[str, Sequence[str], None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
@@ -27,10 +27,10 @@ def upgrade() -> None:
     sa.Column('entrance_time', sa.Time(), nullable=False),
     sa.Column('exit_time', sa.Time(), nullable=False),
     sa.Column('is_released', sa.Boolean(), nullable=False),
-    sa.Column('reseaon_of_releasing', sa.String(), nullable=False),
-    sa.Column('mission_kind', sa.String(), nullable=False),
-    sa.Column('mission_time', sa.Time(), nullable=False),
-    sa.Column('overtime_work', sa.Time(), nullable=False),
+    sa.Column('reseaon_of_releasing', sa.String(), nullable=True),
+    sa.Column('mission_kind', sa.String(), nullable=True),
+    sa.Column('mission_time', sa.Time(), nullable=True),
+    sa.Column('overtime_work', sa.Float(), nullable=True),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_table('users',

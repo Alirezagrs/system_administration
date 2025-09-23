@@ -1,7 +1,9 @@
 from PyQt6.QtWidgets import QDialog, QPushButton, QHBoxLayout,\
-    QFrame, QVBoxLayout, QWidget, QLineEdit
+    QFrame, QVBoxLayout,QLineEdit, QMessageBox
 from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QFont
+
+from services.users_employees_operations import create_employee
 
 class UserCrud(QDialog):
     def __init__(self):
@@ -30,6 +32,7 @@ class UserCrud(QDialog):
         self.create_btn = QPushButton()
         self.create_btn.setFont(self._font)
         self.create_btn.setText("ایجاد")
+        self.create_btn.clicked.connect(self.create_employee)
         self.create_btn.setCursor(Qt.CursorShape.PointingHandCursor)
         self.create_btn.setStyleSheet("""
         QPushButton{
@@ -48,6 +51,7 @@ class UserCrud(QDialog):
         self.delete_btn = QPushButton()
         self.delete_btn.setFont(self._font)
         self.delete_btn.setText("حذف")
+        self.delete_btn.clicked.connect(self.delete_employee)
         self.delete_btn.setCursor(Qt.CursorShape.PointingHandCursor)
         self.delete_btn.setStyleSheet("""
         QPushButton{
@@ -65,6 +69,7 @@ class UserCrud(QDialog):
         self.edit_btn = QPushButton()
         self.edit_btn.setFont(self._font)
         self.edit_btn.setText("ویرایش")
+        self.edit_btn.clicked.connect(self.edit_employee)
         self.edit_btn.setCursor(Qt.CursorShape.PointingHandCursor)
         self.edit_btn.setStyleSheet("""
         QPushButton{
@@ -81,9 +86,9 @@ class UserCrud(QDialog):
     """)
 
         #inputs
-        self.create_input = QLineEdit()
-        self.create_input.setPlaceholderText('نام')
-        self.create_input.setStyleSheet("""
+        self.name_input = QLineEdit()
+        self.name_input.setPlaceholderText('نام')
+        self.name_input.setStyleSheet("""
             QLineEdit{
                 font-size: 18px;
                 padding: 8px;
@@ -94,9 +99,9 @@ class UserCrud(QDialog):
                 font-weight: bold;
             }        
     """)
-        self.delete_input = QLineEdit()
-        self.delete_input.setPlaceholderText('نام خانوادگی')
-        self.delete_input.setStyleSheet("""
+        self.last_name_input = QLineEdit()
+        self.last_name_input.setPlaceholderText('نام خانوادگی')
+        self.last_name_input.setStyleSheet("""
             QLineEdit{
                 font-size: 18px;
                 padding: 8px;
@@ -107,9 +112,9 @@ class UserCrud(QDialog):
                 font-weight: bold;
             }        
     """)
-        self.edit_input = QLineEdit()
-        self.edit_input.setPlaceholderText('درجه')
-        self.edit_input.setStyleSheet("""
+        self.badge_input = QLineEdit()
+        self.badge_input.setPlaceholderText('درجه')
+        self.badge_input.setStyleSheet("""
             QLineEdit{
                 font-size: 18px;
                 padding: 8px;
@@ -123,9 +128,9 @@ class UserCrud(QDialog):
 
         #layout
         self.vlayout_input = QVBoxLayout()
-        self.vlayout_input.addWidget(self.create_input)
-        self.vlayout_input.addWidget(self.delete_input)
-        self.vlayout_input.addWidget(self.edit_input)
+        self.vlayout_input.addWidget(self.name_input)
+        self.vlayout_input.addWidget(self.last_name_input)
+        self.vlayout_input.addWidget(self.badge_input)
         self.vframe.setLayout(self.vlayout_input)
 
         self.hlayout_btn = QHBoxLayout()
@@ -138,6 +143,35 @@ class UserCrud(QDialog):
         self.vlayout_main.addWidget(self.vframe)
         self.vlayout_main.addWidget(self.hframe)
 
-
+        # different with QMainwindow we dont have setCentralWidget()
         self.setLayout(self.vlayout_main)
+
+
+    def create_employee(self):
+        self.name_input_value = self.name_input.text()
+        self.last_name_input_value = self.last_name_input.text()
+        self.badge_input_value = self.badge_input.text()
+
+        create_employee(
+            self.name_input_value,
+            self.last_name_input_value,
+            self.badge_input_value
+        )
+
+        QMessageBox.information(
+            self,
+            "ثبت موفق",
+            "کارمند با موفقیت ثبت شد."
+        )
+
+
+
+
+
+    def delete_employee(self):
+        ...
+    def edit_employee(self):
+        ...
+
+
         

@@ -5,7 +5,7 @@ from PyQt6.QtGui import QFont
 
 from utils.persian_datetime import persian_date, convert_calender_to_persian as cp
 from utils.mention_of_day import find_mention_of_the_day
-from src.crud_user_window import UserCrud
+from src.crud_employee_window import UserCrud
 
 
 
