@@ -1,4 +1,3 @@
-from poplib import LF
 from PyQt6.QtWidgets import QMainWindow, QLabel, QTableWidget, \
     QPushButton, QHBoxLayout, QFrame, QVBoxLayout, QWidget, QDateEdit
 from PyQt6.QtCore import Qt, QDate, QLocale, QCalendar
@@ -6,6 +5,8 @@ from PyQt6.QtGui import QFont
 
 from utils.persian_datetime import persian_date, convert_calender_to_persian as cp
 from utils.mention_of_day import find_mention_of_the_day
+from src.crud_user_window import UserCrud
+
 
 
 class ManageWindow(QMainWindow):
@@ -49,6 +50,27 @@ class ManageWindow(QMainWindow):
         self.content.setStyleSheet("background-color: #f5f5f5;")
 
         # __________________widgets___________________
+        # create user btn
+        self.create_user_btn = QPushButton()
+        self.create_user_btn.clicked.connect(self.create_user_handler)
+        self.create_user_btn.setFont(self._font)
+        self.create_user_btn.setCursor(Qt.CursorShape.PointingHandCursor)
+        self.create_user_btn.setFixedHeight(25)
+        self.create_user_btn.setText("ایجاد کارمند➕")
+        self.create_user_btn.setStyleSheet("""
+        QPushButton{
+            background: #07b813;
+            color: white;
+            font-size: 12px;
+            text-align: center;   
+        }
+        QPushButton:hover{
+            background: #09e818;
+            color: white;
+            font-size: 12px;
+        }
+    """)
+
         # search date in db btn
         self.search_btn = QPushButton()
         self.search_btn.setFont(self._font)
@@ -60,11 +82,13 @@ class ManageWindow(QMainWindow):
             background: #07b813;
             color: white;
             font-size: 12px;
+            padding-bottom: 5px 
         }
         QPushButton:hover{
             background: #09e818;
             color: white;
             font-size: 12px;
+            padding-bottom: 5px 
         }
     """)
         # date
@@ -227,6 +251,8 @@ class ManageWindow(QMainWindow):
 
         # date layout
         self.container_hlayout_date = QHBoxLayout()
+        
+        self.container_hlayout_date.addWidget(self.create_user_btn)
         self.container_hlayout_date.addStretch()
         self.container_hlayout_date.addWidget(self.search_btn)
         self.container_hlayout_date.addWidget(
@@ -286,6 +312,9 @@ class ManageWindow(QMainWindow):
             }
         """)
         return self.btn
+
+    def create_user_handler(self):
+        self.user_crud_window = UserCrud()
 
     def close_program(self):
         from src.login_window import LoginWindow  # for circular import
