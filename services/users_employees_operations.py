@@ -1,4 +1,4 @@
-from sqlalchemy import select
+from sqlalchemy import select, delete
 
 from db.config import create_session
 from db.models import Users, Employees, EInfo
@@ -51,3 +51,13 @@ def create_employee(name, last_name, badge):
         session.add(employee)
         session.commit()
 
+
+def delete_employee(name, last_name, badge):
+    with create_session() as session:
+        employee = delete(Employees).where(
+            Employees.first_name==name,
+            Employees.last_name==last_name,
+            Employees.badge==badge
+        )
+        session.execute(employee)
+        session.commit()
