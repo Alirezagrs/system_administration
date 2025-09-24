@@ -1,7 +1,6 @@
 from datetime import date as _date, time
 
-from persiantools.jdatetime import JalaliDateTime as jd
-from sqlalchemy import String, ForeignKey, Date, Time, Boolean, Float
+from sqlalchemy import String, ForeignKey, Date, Time, Boolean
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, \
     MappedAsDataclass
 
@@ -39,7 +38,7 @@ class EInfo(Base):
     __tablename__ = "employee_info"
 
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
-    date: Mapped[_date] = mapped_column(Date, default= lambda: jd.today().to_gregorian())
+    date: Mapped[_date] = mapped_column(Date)
     entrance_time: Mapped[time] = mapped_column(Time, default=time(7,0,0))
     exit_time: Mapped[time] = mapped_column(Time, default=time(14,0,0))
     is_released: Mapped[bool] = mapped_column(Boolean, default=False)

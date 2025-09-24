@@ -1,4 +1,7 @@
+from datetime import date
+
 from sqlalchemy import select, delete
+from persiantools.jdatetime import JalaliDate
 
 from db.config import create_session
 from db.models import Users, Employees, EInfo
@@ -37,7 +40,14 @@ def create_user(name, password):
 
 def create_employee(name, last_name, badge):
     with create_session() as session:
-        employee_info = EInfo()
+        today_date = JalaliDate.today()
+        employee_info = EInfo(
+            date=date(
+                today_date.year,
+                today_date.month,
+                today_date.day
+                )
+        )
         session.add(employee_info)
         session.commit()
         

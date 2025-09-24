@@ -165,7 +165,6 @@ class ManageWindow(QMainWindow):
             self.table.setItem(i, 10, QTableWidgetItem(empinfo.overtime_work))
 
 
-
         self.table.setLayoutDirection(Qt.LayoutDirection.RightToLeft)
         self.table.setHorizontalHeaderLabels(
             [
