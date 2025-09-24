@@ -38,7 +38,7 @@ class EInfo(Base):
     __tablename__ = "employee_info"
 
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
-    date: Mapped[_date] = mapped_column(Date)
+    date: Mapped[_date] = mapped_column(Date, nullable=True)
     entrance_time: Mapped[time] = mapped_column(Time, default=time(7,0,0))
     exit_time: Mapped[time] = mapped_column(Time, default=time(14,0,0))
     is_released: Mapped[bool] = mapped_column(Boolean, default=False)

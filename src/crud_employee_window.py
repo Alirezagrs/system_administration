@@ -4,7 +4,7 @@ from PyQt6.QtWidgets import QDialog, QPushButton, QHBoxLayout, \
 from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QFont
 
-from services.users_employees_operations import create_employee, \
+from services.users_employees_operations import _create_employee, \
     delete_employee, get_employees
 
 
@@ -135,7 +135,7 @@ class UserCrud(QDialog):
 
         if (self.name_input_value and
                 self.last_name_input_value and self.badge_input_value):
-            create_employee(
+            _create_employee(
                 self.name_input_value,
                 self.last_name_input_value,
                 self.badge_input_value
@@ -158,7 +158,7 @@ class UserCrud(QDialog):
         self.last_name_input_value = self.last_name_input.text()
         self.badge_input_value = self.badge_input.text()
 
-        for emp, _ in get_employees():
+        for _, emp in get_employees():
             if (emp.first_name == self.name_input_value and
                     emp.last_name == self.last_name_input_value and 
                     emp.badge == self.badge_input_value

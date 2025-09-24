@@ -8,7 +8,7 @@ from persiantools.jdatetime import JalaliDate
 from utils.persian_datetime import persian_date, convert_calender_to_persian as cp
 from utils.mention_of_day import find_mention_of_the_day
 from src.crud_employee_window import UserCrud
-from services.users_employees_operations import get_employees
+from services.users_employees_operations import get_employees_by_date, get_employees
 
 
 class ManageWindow(QMainWindow):
@@ -152,21 +152,21 @@ class ManageWindow(QMainWindow):
     """)
 
         # table
-        self.table = QTableWidget(len(get_employees()), 11)
-        for i, (emp, empinfo) in enumerate(get_employees()):
+        date_value = self.search_btn_handler()   #optimization
+        if not date_value:
+            date_value = get_employees()
+        self.table = QTableWidget(len(date_value), 11)
+        for i, (empinfo, emp) in enumerate(date_value):
             self.table.setItem(i, 0, QTableWidgetItem(emp.first_name))
             self.table.setItem(i, 1, QTableWidgetItem(emp.last_name))
             self.table.setItem(i, 2, QTableWidgetItem(emp.badge))
             self.table.setItem(i, 3, QTableWidgetItem(str(empinfo.date)))
-            self.table.setItem(i, 4, QTableWidgetItem(
-                str(empinfo.entrance_time)))
+            self.table.setItem(i, 4, QTableWidgetItem(str(empinfo.entrance_time)))
             self.table.setItem(i, 5, QTableWidgetItem(str(empinfo.exit_time)))
             self.table.setItem(i, 6, QTableWidgetItem(empinfo.is_released))
-            self.table.setItem(i, 7, QTableWidgetItem(
-                empinfo.reseaon_of_releasing))
+            self.table.setItem(i, 7, QTableWidgetItem(empinfo.reseaon_of_releasing))
             self.table.setItem(i, 8, QTableWidgetItem(empinfo.mission_kind))
-            self.table.setItem(i, 9, QTableWidgetItem(
-                str(empinfo.mission_time)))
+            self.table.setItem(i, 9, QTableWidgetItem(str(empinfo.mission_time)))
             self.table.setItem(i, 10, QTableWidgetItem(empinfo.overtime_work))
 
         self.table.setLayoutDirection(Qt.LayoutDirection.RightToLeft)
@@ -346,13 +346,21 @@ class ManageWindow(QMainWindow):
         # just need it once no need to use self(ref count)
         # in spite of being persian calender in window i got problem of
         # getting the value. it was gregorian(میلادی)
-        selected_date = self.date_edit.date().toPyDate()
+        selected_date = self.date_edit.date().toPyDate() # convert string to date obj
         persian_date = JalaliDate.to_jalali(
             selected_date.year,
             selected_date.month,
             selected_date.day)
         
-        print(persian_date)
+        _filter = get_employees_by_date(
+            persian_date.year,
+            persian_date.month,
+            persian_date.day
+        )
+
+        return _filter
+        
+  
         
 
         

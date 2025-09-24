@@ -38,16 +38,10 @@ def create_user(name, password):
                 session.commit()
 
 
-def create_employee(name, last_name, badge):
+def _create_employee(name, last_name, badge):
     with create_session() as session:
         today_date = JalaliDate.today()
-        employee_info = EInfo(
-            date=date(
-                today_date.year,
-                today_date.month,
-                today_date.day
-                )
-        )
+        employee_info = EInfo()
         session.add(employee_info)
         session.commit()
         
@@ -74,8 +68,8 @@ def delete_employee(name, last_name, badge):
 
 def get_employees():
     with create_session() as session:
-        employees= select(Employees, EInfo).join(
-            EInfo, Employees.info_id==EInfo.id
+        employees = select(EInfo, Employees).join(
+            Employees, Employees.info_id==EInfo.id
         )
 
         result = session.execute(employees)
@@ -83,3 +77,20 @@ def get_employees():
             res = result.all()
             return res 
 
+def get_employees_by_date(year, month, day):
+    with create_session() as session:
+        employees = select(EInfo, Employees
+        ).where(
+            EInfo.date==date(year, month, day)
+        ).join(
+            Employees, EInfo.id==Employees.info_id
+        )
+
+        result = session.execute(employees)
+        if result:
+            res = result.all()
+            return res 
+
+
+def admit_table_changes():
+    ...
