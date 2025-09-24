@@ -1,4 +1,4 @@
-import jdatetime
+
 from persiantools.jdatetime import JalaliDate
 
 
@@ -7,6 +7,6 @@ def persian_date():
     return p_date
 
 def convert_calender_to_persian():
-    today_jalali = jdatetime.date.today()
+    today_jalali = JalaliDate.today()
     return today_jalali
     
