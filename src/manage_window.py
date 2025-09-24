@@ -1,12 +1,13 @@
 from PyQt6.QtWidgets import QMainWindow, QLabel, QTableWidget, \
-    QPushButton, QHBoxLayout, QFrame, QVBoxLayout, QWidget, QDateEdit
+    QPushButton, QHBoxLayout, QFrame, QVBoxLayout, QWidget, QDateEdit, \
+    QTableWidgetItem
 from PyQt6.QtCore import Qt, QDate, QLocale, QCalendar
 from PyQt6.QtGui import QFont
 
 from utils.persian_datetime import persian_date, convert_calender_to_persian as cp
 from utils.mention_of_day import find_mention_of_the_day
 from src.crud_employee_window import UserCrud
-
+from services.users_employees_operations import get_employees
 
 
 class ManageWindow(QMainWindow):
@@ -149,7 +150,22 @@ class ManageWindow(QMainWindow):
     """)
 
         # table
-        self.table = QTableWidget(6, 11)
+        self.table = QTableWidget(len(get_employees()), 11)
+        for i, (emp, empinfo) in enumerate(get_employees()):
+            self.table.setItem(i, 0, QTableWidgetItem(emp.first_name))
+            self.table.setItem(i, 1, QTableWidgetItem(emp.last_name))
+            self.table.setItem(i, 2, QTableWidgetItem(emp.badge))
+            self.table.setItem(i, 3, QTableWidgetItem(str(empinfo.date)))
+            self.table.setItem(i, 4, QTableWidgetItem(str(empinfo.entrance_time)))
+            self.table.setItem(i, 5, QTableWidgetItem(str(empinfo.exit_time)))
+            self.table.setItem(i, 6, QTableWidgetItem(empinfo.is_released))
+            self.table.setItem(i, 7, QTableWidgetItem(empinfo.reseaon_of_releasing))
+            self.table.setItem(i, 8, QTableWidgetItem(empinfo.mission_kind))
+            self.table.setItem(i, 9, QTableWidgetItem(str(empinfo.mission_time)))
+            self.table.setItem(i, 10, QTableWidgetItem(empinfo.overtime_work))
+
+
+
         self.table.setLayoutDirection(Qt.LayoutDirection.RightToLeft)
         self.table.setHorizontalHeaderLabels(
             [
@@ -251,7 +267,7 @@ class ManageWindow(QMainWindow):
 
         # date layout
         self.container_hlayout_date = QHBoxLayout()
-        
+
         self.container_hlayout_date.addWidget(self.create_user_btn)
         self.container_hlayout_date.addStretch()
         self.container_hlayout_date.addWidget(self.search_btn)

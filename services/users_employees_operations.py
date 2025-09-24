@@ -5,7 +5,6 @@ from db.models import Users, Employees, EInfo
 
 
 def create_user(name, password):
-
     with create_session() as session:
         if_user_exists = select(Users).where(
             Users.name == name,
@@ -61,3 +60,16 @@ def delete_employee(name, last_name, badge):
         )
         session.execute(employee)
         session.commit()
+
+
+def get_employees():
+    with create_session() as session:
+        employees= select(Employees, EInfo).join(
+            EInfo, Employees.info_id==EInfo.id
+        )
+
+        result = session.execute(employees)
+        if result:
+            res = result.all()
+            return res 
+
