@@ -1,6 +1,6 @@
 from datetime import date
 
-from sqlalchemy import select, delete, update
+from sqlalchemy import and_, select, delete, update, and_
 from persiantools.jdatetime import JalaliDate
 
 from db.config import create_session
@@ -40,11 +40,11 @@ def create_user(name, password):
 
 def _create_employee(name, last_name, badge):
     with create_session() as session:
-        today_date = JalaliDate.today()
         employee_info = EInfo()
         session.add(employee_info)
         session.commit()
-
+        session.refresh(employee_info)
+        
         employee = Employees(
             first_name=name,
             last_name=last_name,
@@ -81,7 +81,7 @@ def get_employees():
 def get_employees_by_date(year, month, day):
     with create_session() as session:
         employees = select(EInfo, Employees
-                           ).where(
+        ).where(
             EInfo.date == date(year, month, day)
         ).join(
             Employees, EInfo.id == Employees.info_id
@@ -97,11 +97,14 @@ def admit_table_changes(name, lname, badge, date, entrance_time, exit_time,
                         is_released, reseaon_of_releasing, mission_kind,
                         mission_time, overtime_work):
     with create_session() as session:
+        # we do not have join in update
         new_emps_data = update(EInfo).where(
-            Employees.first_name == name,
-            Employees.last_name == lname,
-            Employees.badge == badge
-        ).values(
+            and_(
+                EInfo.id==Employees.info_id,
+                Employees.first_name == name,
+                Employees.last_name == lname,
+                Employees.badge == badge
+            )).values(
             date = date,
             entrance_time = entrance_time,
             exit_time =exit_time ,

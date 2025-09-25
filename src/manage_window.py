@@ -13,13 +13,12 @@ from PyQt6.QtWidgets import (QMainWindow,
 from PyQt6.QtCore import Qt, QDate, QLocale, QCalendar
 from PyQt6.QtGui import QFont
 from persiantools.jdatetime import JalaliDateTime, JalaliDate
-from persiantools.digits import fa_to_en
-
 
 from utils.persian_datetime import (persian_date,
                                     convert_calender_to_persian as cp
                                     )
 from utils.mention_of_day import find_mention_of_the_day
+from utils.persian_datetime import convert_slash_to_dash
 from src.crud_employee_window import UserCrud
 from services.users_employees_operations import (get_employees_by_date,
                                                  get_employees,
@@ -380,26 +379,40 @@ class ManageWindow(QMainWindow):
             persian_date.month,
             persian_date.day
         )
-        if not _filter:
-            _filter = get_employees()
+        
+        if _filter:
+            self.table.setRowCount(0)
+            for i, (empinfo, emp) in enumerate(_filter):
+                self.table.insertRow(i)
+                self.table.setItem(i, 0, QTableWidgetItem(emp.first_name))
+                self.table.setItem(i, 1, QTableWidgetItem(emp.last_name))
+                self.table.setItem(i, 2, QTableWidgetItem(emp.badge))
+                self.table.setItem(i, 3, QTableWidgetItem(convert_slash_to_dash(self.date_edit.text())))
+                self.table.setItem(i, 4, QTableWidgetItem(str(empinfo.entrance_time)))
+                self.table.setItem(i, 5, QTableWidgetItem(str(empinfo.exit_time)))
+                self.table.setItem(i, 6, QTableWidgetItem(empinfo.is_released))
+                self.table.setItem(i, 7, QTableWidgetItem(empinfo.reseaon_of_releasing))
+                self.table.setItem(i, 8, QTableWidgetItem(empinfo.mission_kind))
+                self.table.setItem(i, 9, QTableWidgetItem(str(empinfo.mission_time)))
+                self.table.setItem(i, 10, QTableWidgetItem(str(empinfo.overtime_work))) # can not show in float
 
-        self.table.setRowCount(0)
-        for i, (empinfo, emp) in enumerate(_filter):
-            self.table.insertRow(i)
-            self.table.setItem(i, 0, QTableWidgetItem(emp.first_name))
-            self.table.setItem(i, 1, QTableWidgetItem(emp.last_name))
-            self.table.setItem(i, 2, QTableWidgetItem(emp.badge))
-            self.table.setItem(i, 3, QTableWidgetItem(fa_to_en(str(self.date_edit.text()))))
-            self.table.setItem(i, 4, QTableWidgetItem(
-                str(empinfo.entrance_time)))
-            self.table.setItem(i, 5, QTableWidgetItem(str(empinfo.exit_time)))
-            self.table.setItem(i, 6, QTableWidgetItem(empinfo.is_released))
-            self.table.setItem(i, 7, QTableWidgetItem(
-                empinfo.reseaon_of_releasing))
-            self.table.setItem(i, 8, QTableWidgetItem(empinfo.mission_kind))
-            self.table.setItem(i, 9, QTableWidgetItem(
-                str(empinfo.mission_time)))
-            self.table.setItem(i, 10, QTableWidgetItem(empinfo.overtime_work))
+        else:
+            _filter = get_employees()
+            print(_filter)
+            self.table.setRowCount(0)
+            for i, (empinfo, emp) in enumerate(_filter):
+                self.table.insertRow(i)
+                self.table.setItem(i, 0, QTableWidgetItem(emp.first_name))
+                self.table.setItem(i, 1, QTableWidgetItem(emp.last_name))
+                self.table.setItem(i, 2, QTableWidgetItem(emp.badge))
+                self.table.setItem(i, 3, QTableWidgetItem(convert_slash_to_dash(self.date_edit.text())))
+                self.table.setItem(i, 4, QTableWidgetItem(""))
+                self.table.setItem(i, 5, QTableWidgetItem(""))
+                self.table.setItem(i, 6, QTableWidgetItem(""))
+                self.table.setItem(i, 7, QTableWidgetItem(""))
+                self.table.setItem(i, 8, QTableWidgetItem(""))
+                self.table.setItem(i, 9, QTableWidgetItem(""))
+                self.table.setItem(i, 10, QTableWidgetItem("")) # can not show in float
 
     def admit_employees(self):
         data = {}
@@ -409,30 +422,30 @@ class ManageWindow(QMainWindow):
                 item = self.table.item(row, col)
                 col_data.append(item.text() if item.text() else "")
             data[row] = col_data
-        # try:
-        for _, data_ in data.items():
-            
-            # I must cast types to be save in db
-            # all the values of table are str
-            admit_table_changes(
-                name=data_[0],
-                lname=data_[1],
-                badge=data_[2],
-                date=JalaliDate.fromisoformat(data_[3]).to_gregorian(),
-                entrance_time=JalaliDateTime.strptime(data_[4],"%H:%M:%S").time(),
-                exit_time=JalaliDateTime.strptime(data_[5],"%H:%M:%S").time(),
-                is_released=False if data_[6]=='None' else data_[6],
-                reseaon_of_releasing=data_[7],
-                mission_kind=data_[8],
-                mission_time=(None if data_[9]=='None' else JalaliDateTime.strptime(data_[9],"%H:%M:%S").time()),
-                overtime_work=float(data_[10])
-            )
+        try:
+            for _, data_ in data.items():
                 
-        # except Exception as e:
-        #     print(e)
-        # else:
-        #     QMessageBox.information(
-        #         self,
-        #         "ثبت موفق",
-        #         "تمامی کارکنان با اطلاعات جدید ثبت شدند."
-            # )
+                # I must cast types to be save in db
+                # all the values of table are str
+                admit_table_changes(
+                    name=data_[0],
+                    lname=data_[1],
+                    badge=data_[2],
+                    date=JalaliDate.fromisoformat(data_[3]).to_gregorian(),
+                    entrance_time=JalaliDateTime.strptime(data_[4],"%H:%M:%S").time(),
+                    exit_time=JalaliDateTime.strptime(data_[5],"%H:%M:%S").time(),
+                    is_released=(False if data_[6]=="" else True),
+                    reseaon_of_releasing=data_[7],
+                    mission_kind=data_[8],
+                    mission_time=(None if data_[9]=="" else JalaliDateTime.strptime(data_[9],"%H:%M:%S").time()),
+                    overtime_work=float(data_[10])
+                )
+                
+        except Exception as e:
+            print(e)
+        else:
+            QMessageBox.information(
+                self,
+                "ثبت موفق",
+                "تمامی کارکنان با اطلاعات جدید ثبت شدند."
+            )
