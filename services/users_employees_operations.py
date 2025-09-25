@@ -1,6 +1,6 @@
 from datetime import date
 
-from sqlalchemy import select, delete
+from sqlalchemy import select, delete, update
 from persiantools.jdatetime import JalaliDate
 
 from db.config import create_session
@@ -44,7 +44,7 @@ def _create_employee(name, last_name, badge):
         employee_info = EInfo()
         session.add(employee_info)
         session.commit()
-        
+
         employee = Employees(
             first_name=name,
             last_name=last_name,
@@ -58,9 +58,9 @@ def _create_employee(name, last_name, badge):
 def delete_employee(name, last_name, badge):
     with create_session() as session:
         employee = delete(Employees).where(
-            Employees.first_name==name,
-            Employees.last_name==last_name,
-            Employees.badge==badge
+            Employees.first_name == name,
+            Employees.last_name == last_name,
+            Employees.badge == badge
         )
         session.execute(employee)
         session.commit()
@@ -69,28 +69,48 @@ def delete_employee(name, last_name, badge):
 def get_employees():
     with create_session() as session:
         employees = select(EInfo, Employees).join(
-            Employees, Employees.info_id==EInfo.id
+            Employees, Employees.info_id == EInfo.id
         )
 
         result = session.execute(employees)
         if result:
             res = result.all()
-            return res 
+            return res
+
 
 def get_employees_by_date(year, month, day):
     with create_session() as session:
         employees = select(EInfo, Employees
-        ).where(
-            EInfo.date==date(year, month, day)
+                           ).where(
+            EInfo.date == date(year, month, day)
         ).join(
-            Employees, EInfo.id==Employees.info_id
+            Employees, EInfo.id == Employees.info_id
         )
 
         result = session.execute(employees)
         if result:
             res = result.all()
-            return res 
+            return res
 
 
-def admit_table_changes():
-    ...
+def admit_table_changes(name, lname, badge, date, entrance_time, exit_time,
+                        is_released, reseaon_of_releasing, mission_kind,
+                        mission_time, overtime_work):
+    with create_session() as session:
+        new_emps_data = update(EInfo).where(
+            Employees.first_name == name,
+            Employees.last_name == lname,
+            Employees.badge == badge
+        ).values(
+            date = date,
+            entrance_time = entrance_time,
+            exit_time =exit_time ,
+            is_released = is_released,
+            reseaon_of_releasing = reseaon_of_releasing,
+            mission_kind = mission_kind ,
+            mission_time = mission_time,
+            overtime_work = overtime_work,
+        )
+
+        session.execute(new_emps_data)
+        session.commit()

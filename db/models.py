@@ -1,6 +1,6 @@
 from datetime import date as _date, time
 
-from sqlalchemy import String, ForeignKey, Date, Time, Boolean
+from sqlalchemy import String, ForeignKey, Date, Time, Boolean, UniqueConstraint
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, \
     MappedAsDataclass
 
@@ -20,6 +20,7 @@ class Users(Base):
 
 class Employees(MappedAsDataclass, Base):
     __tablename__ = "employees"
+    __table_args__ = UniqueConstraint("first_name", "last_name", "badge"),
 
     id: Mapped[int] = mapped_column(
         primary_key=True, autoincrement=True, init=False
