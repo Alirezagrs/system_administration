@@ -152,23 +152,8 @@ class ManageWindow(QMainWindow):
     """)
 
         # table
-        date_value = self.search_btn_handler()   #optimization
-        if not date_value:
-            date_value = get_employees()
-        self.table = QTableWidget(len(date_value), 11)
-        for i, (empinfo, emp) in enumerate(date_value):
-            self.table.setItem(i, 0, QTableWidgetItem(emp.first_name))
-            self.table.setItem(i, 1, QTableWidgetItem(emp.last_name))
-            self.table.setItem(i, 2, QTableWidgetItem(emp.badge))
-            self.table.setItem(i, 3, QTableWidgetItem(str(empinfo.date)))
-            self.table.setItem(i, 4, QTableWidgetItem(str(empinfo.entrance_time)))
-            self.table.setItem(i, 5, QTableWidgetItem(str(empinfo.exit_time)))
-            self.table.setItem(i, 6, QTableWidgetItem(empinfo.is_released))
-            self.table.setItem(i, 7, QTableWidgetItem(empinfo.reseaon_of_releasing))
-            self.table.setItem(i, 8, QTableWidgetItem(empinfo.mission_kind))
-            self.table.setItem(i, 9, QTableWidgetItem(str(empinfo.mission_time)))
-            self.table.setItem(i, 10, QTableWidgetItem(empinfo.overtime_work))
-
+        self.table = QTableWidget(0, 11)
+        self.search_btn_handler()
         self.table.setLayoutDirection(Qt.LayoutDirection.RightToLeft)
         self.table.setHorizontalHeaderLabels(
             [
@@ -357,8 +342,21 @@ class ManageWindow(QMainWindow):
             persian_date.month,
             persian_date.day
         )
+        if not _filter:
+            _filter = get_employees()
 
-        return _filter
+        for i, (empinfo, emp) in enumerate(_filter):
+            self.table.setItem(i, 0, QTableWidgetItem(emp.first_name))
+            self.table.setItem(i, 1, QTableWidgetItem(emp.last_name))
+            self.table.setItem(i, 2, QTableWidgetItem(emp.badge))
+            self.table.setItem(i, 3, QTableWidgetItem(str(empinfo.date)))
+            self.table.setItem(i, 4, QTableWidgetItem(str(empinfo.entrance_time)))
+            self.table.setItem(i, 5, QTableWidgetItem(str(empinfo.exit_time)))
+            self.table.setItem(i, 6, QTableWidgetItem(empinfo.is_released))
+            self.table.setItem(i, 7, QTableWidgetItem(empinfo.reseaon_of_releasing))
+            self.table.setItem(i, 8, QTableWidgetItem(empinfo.mission_kind))
+            self.table.setItem(i, 9, QTableWidgetItem(str(empinfo.mission_time)))
+            self.table.setItem(i, 10, QTableWidgetItem(empinfo.overtime_work))
         
   
         
