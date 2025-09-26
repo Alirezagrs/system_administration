@@ -1,6 +1,6 @@
 from datetime import date as _date, time
 
-from sqlalchemy import String, ForeignKey, Date, Time, Boolean, UniqueConstraint
+from sqlalchemy import String, ForeignKey, Date, Time, Boolean
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, \
     MappedAsDataclass
 
@@ -20,33 +20,36 @@ class Users(Base):
 
 class Employees(MappedAsDataclass, Base):
     __tablename__ = "employees"
-    __table_args__ = UniqueConstraint("first_name", "last_name", "badge"),
-
+    # can not use UniqueConstrait here. I get several same values by crating
+    # with several date
     id: Mapped[int] = mapped_column(
         primary_key=True, autoincrement=True, init=False
     )
     first_name: Mapped[str] = mapped_column(String(30))
     last_name: Mapped[str] = mapped_column(String(30))
     badge: Mapped[str] = mapped_column(String(50))
-    # foreignkey + unique = one to one relation
-    info_id: Mapped[int] = mapped_column(
-        ForeignKey("employee_info.id", ondelete="CASCADE",),
-        unique=True
-    )
+    
 
 
 class EInfo(Base):
     __tablename__ = "employee_info"
 
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
-    date: Mapped[_date] = mapped_column(Date, nullable=True)
+    date: Mapped[_date] = mapped_column(Date, nullable=True, unique=True)
     entrance_time: Mapped[time] = mapped_column(Time, default=time(7,0,0))
     exit_time: Mapped[time] = mapped_column(Time, default=time(14,0,0))
-    is_released: Mapped[bool] = mapped_column(Boolean, default=False)
+    is_released: Mapped[str] = mapped_column(String(30), default="خیر")
     reseaon_of_releasing: Mapped[str] = mapped_column(nullable=True)
     mission_kind: Mapped[str] = mapped_column(nullable=True)
     mission_time: Mapped[time] = mapped_column(Time, nullable=True)
     overtime_work: Mapped[float] = mapped_column(nullable=True)
+    # foreignkey + unique = one to one relation
+    employee_id: Mapped[int] = mapped_column(
+        ForeignKey("employees.id", ondelete="SET NULL",),
+        unique=True
+    )
+    fname_after_deleting: Mapped[str] = mapped_column(String(50))
+    lname_after_deleting: Mapped[str] = mapped_column(String(50))
 
 
 class Customers(Base):

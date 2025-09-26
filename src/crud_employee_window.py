@@ -1,11 +1,10 @@
-from traceback import print_tb
 from PyQt6.QtWidgets import QDialog, QPushButton, QHBoxLayout, \
     QFrame, QVBoxLayout, QLineEdit, QMessageBox
 from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QFont
 
 from services.users_employees_operations import _create_employee, \
-    delete_employee, get_employees
+    delete_employee, get_employee
 
 
 class UserCrud(QDialog):
@@ -52,7 +51,7 @@ class UserCrud(QDialog):
         self.delete_btn = QPushButton()
         self.delete_btn.setFont(self._font)
         self.delete_btn.setText("حذف")
-        self.delete_btn.clicked.connect(self.delete_employee)
+        self.delete_btn.clicked.connect(self._delete_employee)
         self.delete_btn.setCursor(Qt.CursorShape.PointingHandCursor)
         self.delete_btn.setStyleSheet("""
         QPushButton{
@@ -153,31 +152,31 @@ class UserCrud(QDialog):
                 "مقدار خالی نمیتوان ذخیره کرد"
             )
 
-    def delete_employee(self):
+    def _delete_employee(self):
         self.name_input_value = self.name_input.text()
         self.last_name_input_value = self.last_name_input.text()
         self.badge_input_value = self.badge_input.text()
 
-        for _, emp in get_employees():
-            if (emp.first_name == self.name_input_value and
-                    emp.last_name == self.last_name_input_value and 
-                    emp.badge == self.badge_input_value
-                ):
-                delete_employee(
-                    self.name_input_value,
-                    self.last_name_input_value,
-                    self.badge_input_value
-                )
-                QMessageBox.information(
-                    self,
-                    "حذف موفق",
-                    "کارمند با موفقیت حذف شد."
-                )
-                # i did not use else here casue i wanted to show just
-                # once if user not found with else it would be shown 
-                # several times(as much as records in db)
-        QMessageBox.information(
-                    self,
-                    "حذف نا موفق",
-                    "کاربر مورد نظر پیدا نشد"
-                )
+        emp = get_employee(
+            self.name_input_value,
+            self.last_name_input_value,
+            self.badge_input_value
+            )
+        if emp:
+            delete_employee(
+                emp.first_name,
+                emp.last_name,
+                emp.badge
+            )
+            QMessageBox.information(
+                self,
+                "حذف موفق",
+                "کارمند با موفقیت حذف شد."
+            )
+        
+        else:
+            QMessageBox.information(
+                self,
+                "حذف نا موفق",
+                "کاربر مورد نظر پیدا نشد"
+            )

@@ -369,15 +369,12 @@ class ManageWindow(QMainWindow):
         # in spite of being persian calender in window i got problem of
         # getting the value. it was gregorian(میلادی)
         selected_date = self.date_edit.date().toPyDate()  # convert string to date obj
-        persian_date = JalaliDate.to_jalali(
-            selected_date.year,
-            selected_date.month,
-            selected_date.day)
+        
 
         _filter = get_employees_by_date(
-            persian_date.year,
-            persian_date.month,
-            persian_date.day
+            selected_date.year,
+            selected_date.month,
+            selected_date.day
         )
         
         if _filter:
@@ -390,7 +387,7 @@ class ManageWindow(QMainWindow):
                 self.table.setItem(i, 3, QTableWidgetItem(convert_slash_to_dash(self.date_edit.text())))
                 self.table.setItem(i, 4, QTableWidgetItem(str(empinfo.entrance_time)))
                 self.table.setItem(i, 5, QTableWidgetItem(str(empinfo.exit_time)))
-                self.table.setItem(i, 6, QTableWidgetItem(empinfo.is_released))
+                self.table.setItem(i, 6, QTableWidgetItem(str(empinfo.is_released)))
                 self.table.setItem(i, 7, QTableWidgetItem(empinfo.reseaon_of_releasing))
                 self.table.setItem(i, 8, QTableWidgetItem(empinfo.mission_kind))
                 self.table.setItem(i, 9, QTableWidgetItem(str(empinfo.mission_time)))
@@ -420,32 +417,32 @@ class ManageWindow(QMainWindow):
             col_data = []
             for col in range(self.table.columnCount()):
                 item = self.table.item(row, col)
-                col_data.append(item.text() if item.text() else "")
+                col_data.append(item.text() if item else "")
             data[row] = col_data
-        try:
-            for _, data_ in data.items():
-                
-                # I must cast types to be save in db
-                # all the values of table are str
-                admit_table_changes(
-                    name=data_[0],
-                    lname=data_[1],
-                    badge=data_[2],
-                    date=JalaliDate.fromisoformat(data_[3]).to_gregorian(),
-                    entrance_time=JalaliDateTime.strptime(data_[4],"%H:%M:%S").time(),
-                    exit_time=JalaliDateTime.strptime(data_[5],"%H:%M:%S").time(),
-                    is_released=(False if data_[6]=="" else True),
-                    reseaon_of_releasing=data_[7],
-                    mission_kind=data_[8],
-                    mission_time=(None if data_[9]=="" else JalaliDateTime.strptime(data_[9],"%H:%M:%S").time()),
-                    overtime_work=float(data_[10])
-                )
-                
-        except Exception as e:
-            print(e)
-        else:
-            QMessageBox.information(
-                self,
-                "ثبت موفق",
-                "تمامی کارکنان با اطلاعات جدید ثبت شدند."
+        # try:
+        for _, data_ in data.items():
+            
+            # I must cast types to be save in db
+            # all the values of table are str
+            admit_table_changes(
+                name=data_[0],
+                lname=data_[1],
+                badge=data_[2],
+                date=JalaliDate.fromisoformat(data_[3]).to_gregorian(),
+                entrance_time=JalaliDateTime.strptime(data_[4],"%H:%M").time(),
+                exit_time=JalaliDateTime.strptime(data_[5],"%H:%M").time(),
+                is_released=("" if data_[6]=="" else data_[6]),
+                reseaon_of_releasing=data_[7],
+                mission_kind=data_[8],
+                mission_time=(None if data_[9]=="" else JalaliDateTime.strptime(data_[9],"%H:%M").time()),
+                overtime_work=float(data_[10])
             )
+                
+        # except Exception as e:
+        #     print(e)
+        # else:
+        #     QMessageBox.information(
+        #         self,
+        #         "ثبت موفق",
+        #         "تمامی کارکنان با اطلاعات جدید ثبت شدند."
+        #     )
