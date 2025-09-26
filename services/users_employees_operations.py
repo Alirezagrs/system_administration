@@ -75,29 +75,26 @@ def delete_employee(name, last_name, badge):
 
 def get_employees():
     with create_session() as session:
-        employees = select(EInfo, Employees).join(
-            Employees, Employees.id == EInfo.employee_id
-        ).distinct()
+        employee = select(Employees.first_name, Employees.last_name, Employees.badge).distinct()
 
-        result = session.execute(employees)
-        if result:
-            res = result.all()
-            return res
+        result = session.execute(employee)
+        unique_employee = result.all()
+        return unique_employee
 
 
 def get_employee(name, lname, badge):
     with create_session() as session:
-        employees = select(Employees).where(
+        employees = select(Employees.first_name, Employees.last_name, Employees.badge).where(
             and_(
                 Employees.first_name == name,
                 Employees.last_name == lname,
                 Employees.badge == badge
             )
-        )
+        ).distinct()
 
         result = session.execute(employees)
         if result:
-            res = result.scalar_one_or_none()
+            res = result.all()
             return res
 
 def get_employees_by_date(year, month, day):

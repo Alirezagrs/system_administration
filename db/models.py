@@ -35,7 +35,7 @@ class EInfo(Base):
     __tablename__ = "employee_info"
 
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
-    date: Mapped[_date] = mapped_column(Date, nullable=True, unique=True)
+    date: Mapped[_date] = mapped_column(Date, nullable=True)
     entrance_time: Mapped[time] = mapped_column(Time, default=time(7,0,0))
     exit_time: Mapped[time] = mapped_column(Time, default=time(14,0,0))
     is_released: Mapped[str] = mapped_column(String(30), default="خیر")
@@ -43,11 +43,10 @@ class EInfo(Base):
     mission_kind: Mapped[str] = mapped_column(nullable=True)
     mission_time: Mapped[time] = mapped_column(Time, nullable=True)
     overtime_work: Mapped[float] = mapped_column(nullable=True)
-    # foreignkey + unique = one to one relation
+
     employee_id: Mapped[int] = mapped_column(
-        ForeignKey("employees.id", ondelete="SET NULL",),
-        unique=True
-    )
+        ForeignKey("employees.id", ondelete="SET NULL",))
+    
     fname_after_deleting: Mapped[str] = mapped_column(String(50))
     lname_after_deleting: Mapped[str] = mapped_column(String(50))
 

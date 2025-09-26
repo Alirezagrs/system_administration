@@ -397,11 +397,11 @@ class ManageWindow(QMainWindow):
             _filter = get_employees()
             print(_filter)
             self.table.setRowCount(0)
-            for i, (empinfo, emp) in enumerate(_filter):
+            for i, emp in enumerate(_filter):
                 self.table.insertRow(i)
-                self.table.setItem(i, 0, QTableWidgetItem(emp.first_name))
-                self.table.setItem(i, 1, QTableWidgetItem(emp.last_name))
-                self.table.setItem(i, 2, QTableWidgetItem(emp.badge))
+                self.table.setItem(i, 0, QTableWidgetItem(emp[0]))
+                self.table.setItem(i, 1, QTableWidgetItem(emp[1]))
+                self.table.setItem(i, 2, QTableWidgetItem(emp[2]))
                 self.table.setItem(i, 3, QTableWidgetItem(convert_slash_to_dash(self.date_edit.text())))
                 self.table.setItem(i, 4, QTableWidgetItem(""))
                 self.table.setItem(i, 5, QTableWidgetItem(""))

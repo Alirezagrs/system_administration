@@ -163,11 +163,12 @@ class UserCrud(QDialog):
             self.badge_input_value
             )
         if emp:
-            delete_employee(
-                emp.first_name,
-                emp.last_name,
-                emp.badge
-            )
+            for e in emp:
+                delete_employee(
+                    e[0],
+                    e[1],
+                    e[2]
+                )
             QMessageBox.information(
                 self,
                 "حذف موفق",
