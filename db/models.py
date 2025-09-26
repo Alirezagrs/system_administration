@@ -36,8 +36,8 @@ class EInfo(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     date: Mapped[_date] = mapped_column(Date, nullable=True)
-    entrance_time: Mapped[time] = mapped_column(Time, default=time(7,0,0))
-    exit_time: Mapped[time] = mapped_column(Time, default=time(14,0,0))
+    entrance_time: Mapped[time] = mapped_column(Time, default=time(7,0))
+    exit_time: Mapped[time] = mapped_column(Time, default=time(14,0))
     is_released: Mapped[str] = mapped_column(String(30), default="خیر")
     reseaon_of_releasing: Mapped[str] = mapped_column(nullable=True)
     mission_kind: Mapped[str] = mapped_column(nullable=True)

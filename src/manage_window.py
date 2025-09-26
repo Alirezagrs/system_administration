@@ -253,7 +253,10 @@ class ManageWindow(QMainWindow):
 
         # vsidebar_btn
         self.enter_e_btn = self.make_vsidebar_btns("ورود و خروج کارکنان", "💼")
-        self.enter_e_btn.setEnabled(True)
+        self.enter_e_btn.setCheckable(True)
+        self.enter_e_btn.setChecked(True)
+        
+
         self.enter_g_btn = self.make_vsidebar_btns("ورود و خروج اشخاص", "🕘")
         self.info_btn = self.make_vsidebar_btns("گزارشات", "📊")
         self.settings_btn = self.make_vsidebar_btns("تنظیمات", "⚙️")
@@ -345,8 +348,9 @@ class ManageWindow(QMainWindow):
                     font-weight: bold;
                     background: transparent;
             }
-            QPushButton:selected{
-                    background: #4358f0; 
+            QPushButton:checked {
+                    background-color: rgba(255,255,255,0.1);
+                    color: white;
             }
             QPushButton:hover{ 
                     background: rgba(255,255,255,0.1); 
