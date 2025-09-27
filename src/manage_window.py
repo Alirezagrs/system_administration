@@ -253,8 +253,7 @@ class ManageWindow(QMainWindow):
 
         # vsidebar_btn
         self.enter_e_btn = self.make_vsidebar_btns("ورود و خروج کارکنان", "💼")
-        self.enter_e_btn.setCheckable(True)
-        self.enter_e_btn.setChecked(True)
+        self.enter_e_btn.clicked.connect(self.enter_e_btn_handler)
         
 
         self.enter_g_btn = self.make_vsidebar_btns("ورود و خروج اشخاص", "🕘")
@@ -291,6 +290,9 @@ class ManageWindow(QMainWindow):
         sidebar_layout.addStretch()
         sidebar_layout.addWidget(self.exit_btn)
         self.vsidebar.setLayout(sidebar_layout)
+
+        self.date_frame.hide()
+        self.table_frame.hide()
 
         # date layout
         self.container_hlayout_date = QHBoxLayout()
@@ -336,6 +338,9 @@ class ManageWindow(QMainWindow):
         self.btn = QPushButton(f"{icon} {text}")
         if "admin" in text or "soldier" in text:
             self.btn.setDisabled(True)
+            self.btn.setCheckable(True)
+
+        self.btn.setCheckable(True)
         self.btn.setFont(self._font)
         self.btn.setCursor(Qt.CursorShape.PointingHandCursor)
         self.btn.setStyleSheet("""
@@ -441,12 +446,29 @@ class ManageWindow(QMainWindow):
                 mission_time=(None if data_[9]=="" else JalaliDateTime.strptime(data_[9],"%H:%M").time()),
                 overtime_work=float(data_[10])
             )
-                
-        # except Exception as e:
-        #     print(e)
-        # else:
-        #     QMessageBox.information(
-        #         self,
-        #         "ثبت موفق",
-        #         "تمامی کارکنان با اطلاعات جدید ثبت شدند."
-        #     )
+
+
+    def enter_e_btn_handler(self):
+        """ if I wanted to use:
+        self.container_hlayout_date.addWidget(self.create_user_btn)
+        self.container_hlayout_date.addWidget(self.admit_btn)
+        self.container_hlayout_date.addStretch()
+        self.container_hlayout_date.addWidget(self.search_btn)
+        self.container_hlayout_date.addWidget(
+            self.date_edit, alignment=Qt.AlignmentFlag.AlignTop | Qt.AlignmentFlag.AlignRight)
+        self.date_frame.setLayout(self.container_hlayout_date)
+
+        self.container_hlayout_table = QHBoxLayout()
+        self.container_hlayout_table.addWidget(self.table)
+        self.table_frame.setLayout(self.container_hlayout_table)
+        ====>>>>
+        after each clicking btn new widgets were added to the layout and their 
+        position got wrong!!!!!
+        """
+
+        if self.enter_e_btn.isChecked():
+            self.date_frame.show()
+            self.table_frame.show()
+        else:
+            self.date_frame.hide()
+            self.table_frame.hide()
