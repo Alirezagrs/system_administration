@@ -59,9 +59,7 @@ class Customers(Base):
     date: Mapped[_date] = mapped_column(Date)
     entrance_time: Mapped[time] = mapped_column(Time)
     exit_time: Mapped[time] = mapped_column(Time)
-    work_with: Mapped[int] = mapped_column(
-        ForeignKey("employees.id", ondelete="CASCADE")
-    )
+    work_with: Mapped[str] = mapped_column(String, nullable=True) 
 
 
 class MilitaryGuy(Base):
@@ -70,9 +68,9 @@ class MilitaryGuy(Base):
         ForeignKey("customers.id", ondelete="CASCADE",),
         primary_key=True
     )
-    badg: Mapped[str] = mapped_column(String(50))
-    organization: Mapped[str] = mapped_column(String(50))
-    gender: Mapped[str] = mapped_column(String(15))
+    badg: Mapped[str] = mapped_column(String(50), nullable=True)
+    organization: Mapped[str] = mapped_column(String(50), nullable=True)
+    gender: Mapped[str] = mapped_column(String(15), nullable=False)
 
 
 class NormalGuy(Base):
@@ -81,4 +79,4 @@ class NormalGuy(Base):
         ForeignKey("customers.id", ondelete="CASCADE"),
         primary_key=True
     )
-    gender: Mapped[str] = mapped_column(String(15))
+    gender: Mapped[str] = mapped_column(String(15), nullable=False)

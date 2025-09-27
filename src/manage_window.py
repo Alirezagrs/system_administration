@@ -58,9 +58,13 @@ class ManageWindow(QMainWindow):
         self.date_frame.setStyleSheet("background-color: #f5f5f5;")
         self.date_frame.setFixedHeight(30)
 
-        # table frame
+        # table_employee frame
         self.table_frame = QFrame()
         self.table_frame.setStyleSheet("background-color: #f5f5f5;")
+
+        # table_guys frame
+        self.guys_table_frame = QFrame()
+        self.guys_table_frame.setStyleSheet("background-color: #f5f5f5;")
 
         # main-frame
         self.content = QFrame()
@@ -187,7 +191,7 @@ class ManageWindow(QMainWindow):
             }
     """)
 
-        # dynamic_table
+        # dynamic_table_of_employees
         self.table = QTableWidget(0, 11)
         self.search_btn_handler()  # getting values dynamicly
         self.table.setLayoutDirection(Qt.LayoutDirection.RightToLeft)
@@ -233,6 +237,52 @@ class ManageWindow(QMainWindow):
                 font-weight: bold;
             }
     """)
+        # dynamic_table_of_guys
+        self.table_of_guys = QTableWidget(0,9)
+        self.table_of_guys.setLayoutDirection(Qt.LayoutDirection.RightToLeft)
+        self.table_of_guys.setHorizontalHeaderLabels(
+            [
+                'نام',
+                'نام خانوادگی',
+                'تاریخ',
+                'زمان ورود',
+                'زمان خروج',
+                'مراجعه به',
+                '(درجه(اگر نظامی است',
+                '(بخش(اگر نظامی است',
+                'جنسیت'
+            ]
+        )
+        self.table_of_guys.setStyleSheet("""
+            QTableWidget {
+                background-color: #faf5f5;
+                alternate-background-color: #f9f9f9;
+                gridline-color: #080707;       
+                font-size: 14px;
+                font-weight: bold;
+                border: 2px solid #fff;
+            }
+            QHeaderView::section {
+                background-color: #474141;       
+                color: white;                   
+                font-weight: bold;
+                font-size: 13px;
+                padding: 5px;
+                border: none;
+            }
+            QTableWidget::item {
+                padding: 4px;
+                font-weight: bold;
+            }
+            QTableWidget::item:selected {
+                background-color: #cce5ff;   
+                color: #000;
+                font-weight: bold;
+            }
+    """)
+
+
+
 
         # hsidebar_label
         self.hsidebar_label = QLabel(f"امروز {persian_date()}")
@@ -257,6 +307,9 @@ class ManageWindow(QMainWindow):
         
 
         self.enter_g_btn = self.make_vsidebar_btns("ورود و خروج اشخاص", "🕘")
+        self.enter_g_btn.clicked.connect(self.enter_g_btn_handler)
+
+
         self.info_btn = self.make_vsidebar_btns("گزارشات", "📊")
         self.settings_btn = self.make_vsidebar_btns("تنظیمات", "⚙️")
         self.exit_btn = self.make_vsidebar_btns("خروج", "")
@@ -293,6 +346,7 @@ class ManageWindow(QMainWindow):
 
         self.date_frame.hide()
         self.table_frame.hide()
+        self.guys_table_frame.hide()
 
         # date layout
         self.container_hlayout_date = QHBoxLayout()
@@ -305,15 +359,21 @@ class ManageWindow(QMainWindow):
             self.date_edit, alignment=Qt.AlignmentFlag.AlignTop | Qt.AlignmentFlag.AlignRight)
         self.date_frame.setLayout(self.container_hlayout_date)
 
-        # table layout
+        # table_of_employees layout
         self.container_hlayout_table = QHBoxLayout()
         self.container_hlayout_table.addWidget(self.table)
         self.table_frame.setLayout(self.container_hlayout_table)
+
+        # table_of_guys layout
+        self.container_hlayout_guys_table = QHBoxLayout()
+        self.container_hlayout_guys_table.addWidget(self.table_of_guys)
+        self.guys_table_frame.setLayout(self.container_hlayout_guys_table)
 
         # layout of date and table
         self.content_layout = QVBoxLayout()
         self.content_layout.addWidget(self.date_frame)
         self.content_layout.addWidget(self.table_frame, stretch=1)
+        self.content_layout.addWidget(self.guys_table_frame, stretch=1)
         self.content_layout.addStretch()
         self.content.setLayout(self.content_layout)
 
@@ -465,10 +525,33 @@ class ManageWindow(QMainWindow):
         after each clicking btn new widgets were added to the layout and their 
         position got wrong!!!!!
         """
+        
 
         if self.enter_e_btn.isChecked():
+
+            self.enter_g_btn.setChecked(False)
+            self.info_btn.setChecked(False)
+            self.settings_btn.setChecked(False) 
+            self.exit_btn.setChecked(False)
+
             self.date_frame.show()
+            self.table_of_guys.hide()
             self.table_frame.show()
         else:
             self.date_frame.hide()
             self.table_frame.hide()
+    
+    def enter_g_btn_handler(self):
+        if self.enter_g_btn.isChecked():
+
+            self.enter_e_btn.setChecked(False)
+            self.info_btn.setChecked(False)
+            self.settings_btn.setChecked(False) 
+            self.exit_btn.setChecked(False)
+
+            self.date_frame.show()
+            self.table_frame.hide()
+            self.guys_table_frame.show()
+        else:
+            self.date_frame.hide()
+            self.guys_table_frame.hide()
