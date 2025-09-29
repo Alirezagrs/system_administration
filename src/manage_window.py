@@ -54,10 +54,15 @@ class ManageWindow(QMainWindow):
         self.vsidebar.setStyleSheet("background-color: #474141;")
         self.vsidebar.setFixedWidth(200)
 
-        # date frame
+        # date frame for employees
         self.date_frame = QFrame()
         self.date_frame.setStyleSheet("background-color: #f5f5f5;")
         self.date_frame.setFixedHeight(30)
+
+        # date frame for guys
+        self.date_frame_guys = QFrame()
+        self.date_frame_guys.setStyleSheet("background-color: #f5f5f5;")
+        self.date_frame_guys.setFixedHeight(30)
 
         # table_employee frame
         self.table_frame = QFrame()
@@ -101,6 +106,27 @@ class ManageWindow(QMainWindow):
         self.admit_btn.setFixedHeight(25)
         self.admit_btn.setText("ثبت کارمند")
         self.admit_btn.setStyleSheet("""
+        QPushButton{
+            background: #07b813;
+            color: white;
+            font-size: 12px;
+            text-align: center;   
+        }
+        QPushButton:hover{
+            background: #09e818;
+            color: white;
+            font-size: 12px;
+        }
+    """)
+        
+    # admitting guys with date ind db button
+        self.admit_guys_btn = QPushButton()
+        self.admit_guys_btn.clicked.connect(self.admit_guys)
+        self.admit_guys_btn.setFont(self._font)
+        self.admit_guys_btn.setCursor(Qt.CursorShape.PointingHandCursor)
+        self.admit_guys_btn.setFixedHeight(25)
+        self.admit_guys_btn.setText("ثبت شخص")
+        self.admit_guys_btn.setStyleSheet("""
         QPushButton{
             background: #07b813;
             color: white;
@@ -283,8 +309,6 @@ class ManageWindow(QMainWindow):
     """)
 
 
-
-
         # hsidebar_label
         self.hsidebar_label = QLabel(f"امروز {persian_date()}")
         self.hsidebar_label.setFont(self._font)
@@ -351,8 +375,9 @@ class ManageWindow(QMainWindow):
         self.date_frame.hide()
         self.table_frame.hide()
         self.guys_table_frame.hide()
+        self.date_frame_guys.hide()
 
-        # date layout
+        # date layout for employee
         self.container_hlayout_date = QHBoxLayout()
 
         self.container_hlayout_date.addWidget(self.create_user_btn)
@@ -362,6 +387,15 @@ class ManageWindow(QMainWindow):
         self.container_hlayout_date.addWidget(
             self.date_edit, alignment=Qt.AlignmentFlag.AlignTop | Qt.AlignmentFlag.AlignRight)
         self.date_frame.setLayout(self.container_hlayout_date)
+
+        # date layout for guys
+        self.container_hlayout_date_guys = QHBoxLayout()
+        self.container_hlayout_date_guys.addWidget(self.admit_guys_btn)
+        self.container_hlayout_date_guys.addStretch()
+        self.container_hlayout_date_guys.addWidget(self.search_btn)
+        self.container_hlayout_date_guys.addWidget(
+            self.date_edit, alignment=Qt.AlignmentFlag.AlignTop | Qt.AlignmentFlag.AlignRight)
+        self.date_frame_guys.setLayout(self.container_hlayout_date_guys)
 
         # table_of_employees layout
         self.container_hlayout_table = QHBoxLayout()
@@ -376,6 +410,7 @@ class ManageWindow(QMainWindow):
         # layout of date and table
         self.content_layout = QVBoxLayout()
         self.content_layout.addWidget(self.date_frame)
+        self.content_layout.addWidget(self.date_frame_guys)
         self.content_layout.addWidget(self.table_frame, stretch=1)
         self.content_layout.addWidget(self.guys_table_frame, stretch=1)
         self.content_layout.addStretch()
@@ -402,7 +437,6 @@ class ManageWindow(QMainWindow):
         self.btn = QPushButton(f"{icon} {text}")
         if "admin" in text or "soldier" in text:
             self.btn.setDisabled(True)
-            self.btn.setCheckable(True)
 
         self.btn.setCheckable(True)
         self.btn.setFont(self._font)
@@ -533,6 +567,8 @@ class ManageWindow(QMainWindow):
                     overtime_work=float(data_[10])
                 )
 
+    def admit_guys(self):
+        pass
 
     def enter_e_btn_handler(self):
         """ if I wanted to use:
@@ -566,6 +602,7 @@ class ManageWindow(QMainWindow):
             self.date_frame.hide()
             self.table_frame.hide()
     
+
     def enter_g_btn_handler(self):
         if self.enter_g_btn.isChecked():
 
@@ -575,8 +612,10 @@ class ManageWindow(QMainWindow):
             self.exit_btn.setChecked(False)
 
             self.table_frame.hide()
-            self.date_frame.show()
-            self.guys_table_frame.show()
-        else:
             self.date_frame.hide()
+            self.date_frame_guys.show()
+            self.guys_table_frame.show()
+
+        else:
+            self.date_frame_guys.hide()
             self.guys_table_frame.hide()
