@@ -8,7 +8,7 @@ from PyQt6.QtWidgets import (QMainWindow,
                              QWidget,
                              QDateEdit,
                              QTableWidgetItem,
-                             QMessageBox
+                             QHeaderView
                              )
 from PyQt6.QtCore import Qt, QDate, QLocale, QCalendar
 from PyQt6.QtGui import QFont
@@ -25,6 +25,7 @@ from services.users_employees_operations import (get_employees_by_date,
                                                  admit_table_changes,
                                                  admit_table_updates
                                                  )
+from services.guys_operations import get_guys_by_date
 
 
 class ManageWindow(QMainWindow):
@@ -140,7 +141,7 @@ class ManageWindow(QMainWindow):
         }
     """)
 
-        # search date in db btn
+        # search date employee in db btn
         self.search_btn = QPushButton()
         self.search_btn.clicked.connect(self.search_btn_handler)
         self.search_btn.setFont(self._font)
@@ -161,7 +162,29 @@ class ManageWindow(QMainWindow):
             padding-bottom: 5px 
         }
     """)
-        # date
+        
+        # search date guys in db btn
+        self.search_btn_guys = QPushButton()
+        self.search_btn_guys.clicked.connect(self.search_btn_guys_handler)
+        self.search_btn_guys.setFont(self._font)
+        self.search_btn_guys.setCursor(Qt.CursorShape.PointingHandCursor)
+        self.search_btn_guys.setFixedHeight(25)
+        self.search_btn_guys.setText("جست و جو")
+        self.search_btn_guys.setStyleSheet("""
+        QPushButton{
+            background: #07b813;
+            color: white;
+            font-size: 12px;
+            padding-bottom: 5px 
+        }
+        QPushButton:hover{
+            background: #09e818;
+            color: white;
+            font-size: 12px;
+            padding-bottom: 5px 
+        }
+    """)
+        # date employee
         self.date_edit = QDateEdit()
         self.date_edit.setFixedHeight(20)
         self.date_edit.setDate(
@@ -178,6 +201,63 @@ class ManageWindow(QMainWindow):
         self.date_edit.setCalendarPopup(True)
         self.date_edit.setDisplayFormat("yyyy/MM/dd")
         self.date_edit.setStyleSheet("""
+            QDateEdit {
+                background-color: white;
+                border: 1px solid #ccc;
+                padding: 2px 4px;
+            }
+            QCalendarWidget QWidget {
+                alternate-background-color: #f5f5f5;
+            }
+            QCalendarWidget QToolButton{
+                color: #fff;
+                background-color: #090a0f;
+                font-weight: bold;
+                border: none;
+                border-radius: 4px;
+                padding: 2px;
+            }
+            QCalendarWidget QToolButton:hover {
+                background-color: #454647;
+            }
+            QCalendarWidget QSpinBox{
+                color: black;
+                background: white;
+                selection-background-color: #03040a;
+            }
+            QCalendarWidget QAbstractItemView:enabled{
+                color: black;
+                selection-background-color: #cce5ff;
+                selection-color: black;
+            }
+            QCalendarWidget QMenu {
+                background-color: #fff;
+                color: black;   
+                border: 1px solid #ccc;
+            }
+            QCalendarWidget QMenu::item:selected {
+                background-color: #e0e0e0;   
+                color: black;
+            }
+    """)
+        
+        #date guys
+        self.date_edit_guys = QDateEdit()
+        self.date_edit_guys.setFixedHeight(20)
+        self.date_edit_guys.setDate(
+            QDate(
+                cp().year,
+                cp().month,
+                cp().day,
+                QCalendar(QCalendar.System.Jalali)
+            )
+        )
+        self.date_edit_guys.setCalendar(QCalendar(QCalendar.System.Jalali))
+        self.date_edit_guys.setLocale(
+            QLocale(QLocale.Language.Persian, QLocale.Country.Iran))
+        self.date_edit_guys.setCalendarPopup(True)
+        self.date_edit_guys.setDisplayFormat("yyyy/MM/dd")
+        self.date_edit_guys.setStyleSheet("""
             QDateEdit {
                 background-color: white;
                 border: 1px solid #ccc;
@@ -265,7 +345,10 @@ class ManageWindow(QMainWindow):
             }
     """)
         # dynamic_table_of_guys
-        self.table_of_guys = QTableWidget(0,9)
+        self.table_of_guys = QTableWidget(0,10)
+        # self.table_of_guys.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeMode.Interactive)
+
+        self.search_btn_guys_handler()
         self.table_of_guys.setLayoutDirection(Qt.LayoutDirection.RightToLeft)
         self.table_of_guys.setHorizontalHeaderLabels(
             [
@@ -274,10 +357,11 @@ class ManageWindow(QMainWindow):
                 'تاریخ',
                 'زمان ورود',
                 'زمان خروج',
+                'جنسیت',
                 'مراجعه به',
-                '(درجه(اگر نظامی است',
-                '(بخش(اگر نظامی است',
-                'جنسیت'
+                'آیا نظامی است؟',
+                'درجه',
+                'بخش/سازمان',
             ]
         )
         self.table_of_guys.setStyleSheet("""
@@ -377,7 +461,7 @@ class ManageWindow(QMainWindow):
         self.guys_table_frame.hide()
         self.date_frame_guys.hide()
 
-        # date layout for employee
+        # hsidebar layout for employee
         self.container_hlayout_date = QHBoxLayout()
 
         self.container_hlayout_date.addWidget(self.create_user_btn)
@@ -388,13 +472,13 @@ class ManageWindow(QMainWindow):
             self.date_edit, alignment=Qt.AlignmentFlag.AlignTop | Qt.AlignmentFlag.AlignRight)
         self.date_frame.setLayout(self.container_hlayout_date)
 
-        # date layout for guys
+        # hsidebar layout for guys
         self.container_hlayout_date_guys = QHBoxLayout()
         self.container_hlayout_date_guys.addWidget(self.admit_guys_btn)
         self.container_hlayout_date_guys.addStretch()
-        self.container_hlayout_date_guys.addWidget(self.search_btn)
+        self.container_hlayout_date_guys.addWidget(self.search_btn_guys)
         self.container_hlayout_date_guys.addWidget(
-            self.date_edit, alignment=Qt.AlignmentFlag.AlignTop | Qt.AlignmentFlag.AlignRight)
+            self.date_edit_guys, alignment=Qt.AlignmentFlag.AlignTop | Qt.AlignmentFlag.AlignRight)
         self.date_frame_guys.setLayout(self.container_hlayout_date_guys)
 
         # table_of_employees layout
@@ -566,6 +650,46 @@ class ManageWindow(QMainWindow):
                     mission_time=(None if data_[9]=="" else JalaliDateTime.strptime(data_[9],"%H:%M").time()),
                     overtime_work=float(data_[10])
                 )
+    def search_btn_guys_handler(self):
+        selected_date = self.date_edit_guys.date().toPyDate()
+
+        _filter = get_guys_by_date(
+            selected_date.year,
+            selected_date.month,
+            selected_date.day
+        )
+        if _filter:
+            self.table_of_guys.setRowCount(0)
+            for i, guy in enumerate(_filter):
+                self.table_of_guys.insertRow(i)
+                self.table_of_guys.setItem(i, 0, QTableWidgetItem(guy[0]))
+                self.table_of_guys.setItem(i, 1, QTableWidgetItem(guy[1]))
+                self.table_of_guys.setItem(i, 2, QTableWidgetItem(guy[2]))
+                self.table_of_guys.setItem(i, 3, QTableWidgetItem(convert_slash_to_dash(self.date_edit_guys.text())))
+                self.table_of_guys.setItem(i, 4, QTableWidgetItem(""))
+                self.table_of_guys.setItem(i, 5, QTableWidgetItem(""))
+                self.table_of_guys.setItem(i, 6, QTableWidgetItem(""))
+                self.table_of_guys.setItem(i, 7, QTableWidgetItem(""))
+                self.table_of_guys.setItem(i, 8, QTableWidgetItem(""))
+                self.table_of_guys.setItem(i, 9, QTableWidgetItem(""))
+
+        else:
+            _filter = range(40) # default rows to be filled out
+            print(_filter)
+            self.table_of_guys.setRowCount(0)
+            for i, guy in enumerate(_filter):
+                self.table_of_guys.insertRow(i)
+                self.table_of_guys.setItem(i, 0, QTableWidgetItem(""))
+                self.table_of_guys.setItem(i, 1, QTableWidgetItem(""))
+                self.table_of_guys.setItem(i, 2, QTableWidgetItem(convert_slash_to_dash(self.date_edit_guys.text())))
+                self.table_of_guys.setItem(i, 3, QTableWidgetItem(""))
+                self.table_of_guys.setItem(i, 4, QTableWidgetItem(""))
+                self.table_of_guys.setItem(i, 5, QTableWidgetItem(""))
+                self.table_of_guys.setItem(i, 6, QTableWidgetItem(""))
+                self.table_of_guys.setItem(i, 7, QTableWidgetItem(""))
+                self.table_of_guys.setItem(i, 8, QTableWidgetItem(""))
+                self.table_of_guys.setItem(i, 9, QTableWidgetItem(""))
+
 
     def admit_guys(self):
         pass
@@ -595,7 +719,8 @@ class ManageWindow(QMainWindow):
             self.settings_btn.setChecked(False) 
             self.exit_btn.setChecked(False)
 
-            self.table_of_guys.hide()
+            self.date_frame_guys.hide()
+            self.guys_table_frame.hide()
             self.date_frame.show()
             self.table_frame.show()
         else:
