@@ -20,7 +20,7 @@ class Users(Base):
 
 class Employees(MappedAsDataclass, Base):
     __tablename__ = "employees"
-    # can not use UniqueConstrait here. I get several same values by crating
+    # can not use UniqueConstrait here. I get several name values by crating
     # with several date
     id: Mapped[int] = mapped_column(
         primary_key=True, autoincrement=True, init=False
@@ -53,6 +53,7 @@ class EInfo(Base):
 
 class Customers(Base):
     __tablename__ = "customers"
+
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     first_name: Mapped[str] = mapped_column(String(30))
     last_name: Mapped[str] = mapped_column(String(30))
@@ -64,6 +65,7 @@ class Customers(Base):
 
 class MilitaryGuy(Base):
     __tablename__ = "military_guys"
+
     id: Mapped[int] = mapped_column(
         ForeignKey("customers.id", ondelete="CASCADE",),
         primary_key=True

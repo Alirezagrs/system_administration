@@ -1,6 +1,6 @@
 from datetime import date
 
-from sqlalchemy import and_, select, delete
+from sqlalchemy import and_, select, delete, update
 
 from db.config import create_session
 from db.models import Users, Employees, EInfo
@@ -143,37 +143,34 @@ def admit_table_changes(name, lname, badge, date, entrance_time, exit_time,
         session.commit()
         
 
-        
+def admit_table_updates(name, lname, badge, date, entrance_time, exit_time,
+                        is_released, reseaon_of_releasing, mission_kind,
+                        mission_time, overtime_work):
+    with create_session() as session:
+        # must not update you must create
+        emp = session.execute(
+            select(Employees, EInfo).where(
+                and_(
+                    Employees.first_name == name,
+                    Employees.last_name == lname,
+                    Employees.badge == badge,
+                    EInfo.date==date
+                )
+            ).join(
+                EInfo, Employees.id==EInfo.employee_id
+            )
+        )
 
+        result = emp.all()    
+        for _, empinfo in result:
+            empinfo.date = date
+            empinfo.entrance_time = entrance_time
+            empinfo.exit_time = exit_time
+            empinfo.is_released = is_released
+            empinfo.reseaon_of_releasing = reseaon_of_releasing
+            empinfo.mission_kind = mission_kind
+            empinfo.mission_time = mission_time
+            empinfo.overtime_work = overtime_work
 
-
-
-
-
-
-
-
-
-        # employee = select(Employees).where(
-        #     and_(
-        #         Employees.first_name == name,
-        #         Employees.last_name == lname,
-        #         Employees.badge == badge
-        #     )
-        # )
-        # result = session.execute(employee)
-        # emp_result = result.scalar_one_or_none()
-        # if not emp_result:
-        #     raise ValueError("کارمند پیدا نشد")
-
-        # info = session.get(EInfo, emp_result.info_id)
-        # if info:
-        #     info.date = date
-        #     info.entrance_time = entrance_time
-        #     info.exit_time = exit_time
-        #     info.is_released = is_released
-        #     info.reseaon_of_releasing = reseaon_of_releasing
-        #     info.mission_kind = mission_kind
-        #     info.mission_time = mission_time
-        #     info.overtime_work = overtime_work
-        # session.commit()
+        session.commit()
+  

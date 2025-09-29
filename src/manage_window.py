@@ -22,7 +22,8 @@ from utils.persian_datetime import convert_slash_to_dash
 from src.crud_employee_window import UserCrud
 from services.users_employees_operations import (get_employees_by_date,
                                                  get_employees,
-                                                 admit_table_changes
+                                                 admit_table_changes,
+                                                 admit_table_updates
                                                  )
 
 
@@ -312,7 +313,10 @@ class ManageWindow(QMainWindow):
 
         self.info_btn = self.make_vsidebar_btns("گزارشات", "📊")
         self.settings_btn = self.make_vsidebar_btns("تنظیمات", "⚙️")
+
+
         self.exit_btn = self.make_vsidebar_btns("خروج", "")
+
 
         # __________________layout____________________
         # hsidebar_layout
@@ -490,10 +494,15 @@ class ManageWindow(QMainWindow):
             data[row] = col_data
         # try:
         for _, data_ in data.items():
+            selected_date = self.date_edit.date().toPyDate()
             
-            # I must cast types to be save in db
-            # all the values of table are str
-            admit_table_changes(
+            _filter = get_employees_by_date(
+                selected_date.year,
+                selected_date.month,
+                selected_date.day
+            )
+            if _filter:
+                admit_table_updates(
                 name=data_[0],
                 lname=data_[1],
                 badge=data_[2],
@@ -505,7 +514,24 @@ class ManageWindow(QMainWindow):
                 mission_kind=data_[8],
                 mission_time=(None if data_[9]=="" else JalaliDateTime.strptime(data_[9],"%H:%M").time()),
                 overtime_work=float(data_[10])
-            )
+                )
+
+            # I must cast types to be save in db
+            # all the values of table are str
+            else:
+                admit_table_changes(
+                    name=data_[0],
+                    lname=data_[1],
+                    badge=data_[2],
+                    date=JalaliDate.fromisoformat(data_[3]).to_gregorian(),
+                    entrance_time=JalaliDateTime.strptime(data_[4],"%H:%M").time(),
+                    exit_time=JalaliDateTime.strptime(data_[5],"%H:%M").time(),
+                    is_released=("" if data_[6]=="" else data_[6]),
+                    reseaon_of_releasing=data_[7],
+                    mission_kind=data_[8],
+                    mission_time=(None if data_[9]=="" else JalaliDateTime.strptime(data_[9],"%H:%M").time()),
+                    overtime_work=float(data_[10])
+                )
 
 
     def enter_e_btn_handler(self):
@@ -525,7 +551,6 @@ class ManageWindow(QMainWindow):
         after each clicking btn new widgets were added to the layout and their 
         position got wrong!!!!!
         """
-        
 
         if self.enter_e_btn.isChecked():
 
@@ -534,8 +559,8 @@ class ManageWindow(QMainWindow):
             self.settings_btn.setChecked(False) 
             self.exit_btn.setChecked(False)
 
-            self.date_frame.show()
             self.table_of_guys.hide()
+            self.date_frame.show()
             self.table_frame.show()
         else:
             self.date_frame.hide()
@@ -549,8 +574,8 @@ class ManageWindow(QMainWindow):
             self.settings_btn.setChecked(False) 
             self.exit_btn.setChecked(False)
 
-            self.date_frame.show()
             self.table_frame.hide()
+            self.date_frame.show()
             self.guys_table_frame.show()
         else:
             self.date_frame.hide()
