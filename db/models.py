@@ -66,4 +66,3 @@ class Customers(Base):
     badge: Mapped[str] = mapped_column(String(50), nullable=True)
     organization: Mapped[str] = mapped_column(String(50), nullable=True)
 
-    

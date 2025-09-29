@@ -24,8 +24,11 @@ from services.users_employees_operations import (get_employees_by_date,
                                                  get_employees,
                                                  admit_table_changes,
                                                  admit_table_updates
-                                                 )
-from services.guys_operations import get_guys_by_date
+                                                )
+from services.guys_operations import (get_guys_by_date,
+                                      admit_table_guys_updates,
+                                      admit_table_guys_changes
+                                    )
 
 
 class ManageWindow(QMainWindow):
@@ -122,7 +125,7 @@ class ManageWindow(QMainWindow):
         
     # admitting guys with date ind db button
         self.admit_guys_btn = QPushButton()
-        self.admit_guys_btn.clicked.connect(self.admit_guys)
+        self.admit_guys_btn.clicked.connect(self.admit_guys_handler)
         self.admit_guys_btn.setFont(self._font)
         self.admit_guys_btn.setCursor(Qt.CursorShape.PointingHandCursor)
         self.admit_guys_btn.setFixedHeight(25)
@@ -603,6 +606,7 @@ class ManageWindow(QMainWindow):
                 self.table.setItem(i, 10, QTableWidgetItem("")) # can not show in float
 
     def admit_employees(self):
+        selected_date = self.date_edit.date().toPyDate()
         data = {}
         for row in range(self.table.rowCount()):
             col_data = []
@@ -611,15 +615,14 @@ class ManageWindow(QMainWindow):
                 col_data.append(item.text() if item else "")
             data[row] = col_data
         # try:
-        for _, data_ in data.items():
-            selected_date = self.date_edit.date().toPyDate()
-            
-            _filter = get_employees_by_date(
+        _filter = get_employees_by_date(
                 selected_date.year,
                 selected_date.month,
                 selected_date.day
             )
-            if _filter:
+        if _filter:    
+            for _, data_ in data.items():
+                print(data_[0])
                 admit_table_updates(
                 name=data_[0],
                 lname=data_[1],
@@ -634,9 +637,10 @@ class ManageWindow(QMainWindow):
                 overtime_work=float(data_[10])
                 )
 
-            # I must cast types to be save in db
-            # all the values of table are str
-            else:
+        # I must cast types to be save in db
+        # all the values of table are str
+        else:
+            for _, data_ in data.items():
                 admit_table_changes(
                     name=data_[0],
                     lname=data_[1],
@@ -662,16 +666,16 @@ class ManageWindow(QMainWindow):
             self.table_of_guys.setRowCount(0)
             for i, guy in enumerate(_filter):
                 self.table_of_guys.insertRow(i)
-                self.table_of_guys.setItem(i, 0, QTableWidgetItem(guy[0]))
-                self.table_of_guys.setItem(i, 1, QTableWidgetItem(guy[1]))
-                self.table_of_guys.setItem(i, 2, QTableWidgetItem(guy[2]))
+                self.table_of_guys.setItem(i, 0, QTableWidgetItem(guy.first_name))
+                self.table_of_guys.setItem(i, 1, QTableWidgetItem(guy.last_name))
+                self.table_of_guys.setItem(i, 2, QTableWidgetItem(guy.))
                 self.table_of_guys.setItem(i, 3, QTableWidgetItem(convert_slash_to_dash(self.date_edit_guys.text())))
-                self.table_of_guys.setItem(i, 4, QTableWidgetItem(""))
-                self.table_of_guys.setItem(i, 5, QTableWidgetItem(""))
-                self.table_of_guys.setItem(i, 6, QTableWidgetItem(""))
-                self.table_of_guys.setItem(i, 7, QTableWidgetItem(""))
-                self.table_of_guys.setItem(i, 8, QTableWidgetItem(""))
-                self.table_of_guys.setItem(i, 9, QTableWidgetItem(""))
+                self.table_of_guys.setItem(i, 4, QTableWidgetItem(guy[4]))
+                self.table_of_guys.setItem(i, 5, QTableWidgetItem(guy[5]))
+                self.table_of_guys.setItem(i, 6, QTableWidgetItem(guy[6]))
+                self.table_of_guys.setItem(i, 7, QTableWidgetItem(guy[7]))
+                self.table_of_guys.setItem(i, 8, QTableWidgetItem(guy[8]))
+                self.table_of_guys.setItem(i, 9, QTableWidgetItem(guy[9]))
 
         else:
             _filter = range(40) # default rows to be filled out
@@ -691,8 +695,53 @@ class ManageWindow(QMainWindow):
                 self.table_of_guys.setItem(i, 9, QTableWidgetItem(""))
 
 
-    def admit_guys(self):
-        pass
+    def admit_guys_handler(self):
+        data = {}
+        for row in range(self.table_of_guys.rowCount()):
+            col_data = []
+            for col in range(self.table_of_guys.columnCount()):
+                item = self.table_of_guys.item(row, col)
+                col_data.append(item.text() if item else "")
+            data[row] = col_data
+        
+        selected_date = self.date_edit_guys.date().toPyDate()
+
+        _filter = get_guys_by_date(
+            selected_date.year,
+            selected_date.month,
+            selected_date.day
+        )
+
+        if _filter:
+            for _, _data in data.items():
+                admit_table_guys_updates(
+                    first_name=_data[0],
+                    last_name=_data[1],
+                    date=JalaliDate.fromisoformat(_data[2]).to_gregorian(),
+                    entrance_time=JalaliDateTime.strptime(_data[3],"%H:%M").time(),
+                    exit_time=JalaliDateTime.strptime(_data[4],"%H:%M").time(),
+                    work_with=_data[5],
+                    gender=_data[6],
+                    is_military=_data[7],
+                    badge=_data[8],
+                    organization=_data[9]
+                )
+        else:
+            for _, _data in data.items():
+                admit_table_guys_changes(
+                    first_name=_data[0],
+                    last_name=_data[1],
+                    date=JalaliDate.fromisoformat(_data[2]).to_gregorian(),
+                    entrance_time=JalaliDateTime.strptime(_data[3],"%H:%M").time(),
+                    exit_time=JalaliDateTime.strptime(_data[4],"%H:%M").time(),
+                    work_with=_data[5],
+                    gender=_data[6],
+                    is_military=_data[7],
+                    badge=_data[8],
+                    organization=_data[9]
+                )
+
+
 
     def enter_e_btn_handler(self):
         """ if I wanted to use:
