@@ -8,7 +8,6 @@ from PyQt6.QtWidgets import (QMainWindow,
                              QWidget,
                              QDateEdit,
                              QTableWidgetItem,
-                             QHeaderView
                              )
 from PyQt6.QtCore import Qt, QDate, QLocale, QCalendar
 from PyQt6.QtGui import QFont
@@ -20,6 +19,7 @@ from utils.persian_datetime import (persian_date,
 from utils.mention_of_day import find_mention_of_the_day
 from utils.persian_datetime import convert_slash_to_dash, normalize_time
 from src.crud_employee_window import UserCrud
+from src.filter_window import FilterWindow
 from services.users_employees_operations import (get_employees_by_date,
                                                  get_employees,
                                                  admit_table_changes,
@@ -81,6 +81,46 @@ class ManageWindow(QMainWindow):
         self.content.setStyleSheet("background-color: #f5f5f5;")
 
         # __________________widgets___________________
+        self.filter_btn_emp = QPushButton()
+        self.filter_btn_emp.clicked.connect(self.filter_handler)
+        self.filter_btn_emp.setText("فیلتر")
+        self.filter_btn_emp.setFont(self._font)
+        self.filter_btn_emp.setFixedHeight(25)
+        self.filter_btn_emp.setCursor(Qt.CursorShape.PointingHandCursor)
+        self.filter_btn_emp.setStyleSheet("""
+        QPushButton{
+            background: #f07807;
+            color: white;
+            font-size: 12px;
+            text-align: center;   
+        }
+        QPushButton:hover{
+            background: #fa7c05;
+            color: white;
+            font-size: 12px;
+        }
+    """)
+        
+        self.filter_btn_guy = QPushButton()
+        self.filter_btn_guy.clicked.connect(self.filter_handler)
+        self.filter_btn_guy.setText("فیلتر")
+        self.filter_btn_guy.setFont(self._font)
+        self.filter_btn_guy.setFixedHeight(25)
+        self.filter_btn_guy.setCursor(Qt.CursorShape.PointingHandCursor)
+        self.filter_btn_guy.setStyleSheet("""
+        QPushButton{
+            background: #f07807;
+            color: white;
+            font-size: 12px;
+            text-align: center;   
+        }
+        QPushButton:hover{
+            background: #fa7c05;
+            color: white;
+            font-size: 12px;
+        }
+    """)
+
         # create user btn
         self.create_user_btn = QPushButton()
         self.create_user_btn.clicked.connect(self.create_user_handler)
@@ -469,6 +509,7 @@ class ManageWindow(QMainWindow):
 
         self.container_hlayout_date.addWidget(self.create_user_btn)
         self.container_hlayout_date.addWidget(self.admit_btn)
+        self.container_hlayout_date.addWidget(self.filter_btn_emp)
         self.container_hlayout_date.addStretch()
         self.container_hlayout_date.addWidget(self.search_btn)
         self.container_hlayout_date.addWidget(
@@ -478,6 +519,7 @@ class ManageWindow(QMainWindow):
         # hsidebar layout for guys
         self.container_hlayout_date_guys = QHBoxLayout()
         self.container_hlayout_date_guys.addWidget(self.admit_guys_btn)
+        self.container_hlayout_date_guys.addWidget(self.filter_btn_guy)
         self.container_hlayout_date_guys.addStretch()
         self.container_hlayout_date_guys.addWidget(self.search_btn_guys)
         self.container_hlayout_date_guys.addWidget(
@@ -798,3 +840,7 @@ class ManageWindow(QMainWindow):
         else:
             self.date_frame_guys.hide()
             self.guys_table_frame.hide()
+    
+
+    def filter_handler(self):
+        self.filter_window = FilterWindow()

@@ -25,8 +25,8 @@ class Employees(MappedAsDataclass, Base):
     id: Mapped[int] = mapped_column(
         primary_key=True, autoincrement=True, init=False
     )
-    first_name: Mapped[str] = mapped_column(String(30))
-    last_name: Mapped[str] = mapped_column(String(30))
+    first_name: Mapped[str] = mapped_column(String(30), index=True)
+    last_name: Mapped[str] = mapped_column(String(30), index=True)
     badge: Mapped[str] = mapped_column(String(50))
     
 
@@ -55,8 +55,8 @@ class Customers(Base):
     __tablename__ = "customers"
 
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
-    first_name: Mapped[str] = mapped_column(String(30))
-    last_name: Mapped[str] = mapped_column(String(30))
+    first_name: Mapped[str] = mapped_column(String(30), index=True)
+    last_name: Mapped[str] = mapped_column(String(30), index=True)
     date: Mapped[_date] = mapped_column(Date)
     entrance_time: Mapped[time] = mapped_column(Time)
     exit_time: Mapped[time] = mapped_column(Time)
