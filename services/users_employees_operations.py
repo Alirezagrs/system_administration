@@ -174,5 +174,25 @@ def admit_table_updates(name, lname, badge, date, entrance_time, exit_time,
 
         session.commit()
   
+
+def change_password_operations(current_pass, new_pass, confirm_new_pass, user_name):
+    with create_session() as session:
+        result = session.execute(
+            select(Users).where(Users.password==current_pass)
+        )
+        
+        user = result.scalar_one_or_none()
+        if user.name==user_name:
+            if user and new_pass==confirm_new_pass:
+                user.password = new_pass
+                session.commit()
+            else:
+                raise ValueError("user not find/ pass are not the same")
+        else:
+            raise TypeError("user trying to abuse to change another user pass")
+        
+
+
+
 def filter_employee_with_features():
     pass

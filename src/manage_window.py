@@ -8,7 +8,8 @@ from PyQt6.QtWidgets import (QMainWindow,
                              QWidget,
                              QDateEdit,
                              QTableWidgetItem,
-                             QLineEdit
+                             QLineEdit,
+                             QMessageBox
                              )
 from PyQt6.QtCore import Qt, QDate, QLocale, QCalendar
 from PyQt6.QtGui import QFont
@@ -24,7 +25,8 @@ from src.filter_window import FilterWindow
 from services.users_employees_operations import (get_employees_by_date,
                                                  get_employees,
                                                  admit_table_changes,
-                                                 admit_table_updates
+                                                 admit_table_updates,
+                                                 change_password_operations
                                                 )
 from services.guys_operations import (get_guys_by_date,
                                       admit_table_guys_updates,
@@ -135,24 +137,21 @@ class ManageWindow(QMainWindow):
         self.confirm_change_pass_btn.clicked.connect(self.change_pass_btn_handler)
         self.confirm_change_pass_btn.setText("تغییر رمز عبور")
         self.confirm_change_pass_btn.setFont(self._font)
-        self.confirm_change_pass_btn.setFixedHeight(25)
+        self.confirm_change_pass_btn.setFixedHeight(45)
         self.confirm_change_pass_btn.setCursor(Qt.CursorShape.PointingHandCursor)
         self.confirm_change_pass_btn.setStyleSheet("""
         QPushButton{
             background: #07b813;
             color: white;
-            font-size: 12px;
+            font-size: 22px;
             text-align: center;   
         }
         QPushButton:hover{
             background: #0ecc1b;
             color: white;
-            font-size: 12px;
+            font-size: 22px;
         }
     """)
-
-
-
 
 
 
@@ -962,4 +961,23 @@ class ManageWindow(QMainWindow):
 
 
     def change_pass_btn_handler(self):
-        pass
+        self.text_of_current_pass = self.current_pass.text()
+        self.text_of_new_pass = self.new_pass.text()
+        self.text_of_confirm_new_pass = self.confirm_new_pass.text()
+        try:
+            change_password_operations(
+                self.text_of_current_pass,
+                self.text_of_new_pass,
+                self.text_of_confirm_new_pass,
+                self.user_name
+            )
+        except ValueError:
+            QMessageBox.information(self,"خطا","رمز ها به درستی وارد نشده")
+
+        except TypeError:
+            QMessageBox.information(self,"خطا","403 permission denied")
+            # log XXXXXXXXXXXXXXXX
+        except AttributeError:
+            QMessageBox.information(self,"خطا","رمز اشتباه است")
+        else:
+            QMessageBox.information(self,"انجام شد","رمز شما با موفقیت تغییر کرد.")
