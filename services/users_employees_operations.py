@@ -174,3 +174,5 @@ def admit_table_updates(name, lname, badge, date, entrance_time, exit_time,
 
         session.commit()
   
+def filter_employee_with_features():
+    pass

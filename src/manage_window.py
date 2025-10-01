@@ -8,6 +8,7 @@ from PyQt6.QtWidgets import (QMainWindow,
                              QWidget,
                              QDateEdit,
                              QTableWidgetItem,
+                             QLineEdit
                              )
 from PyQt6.QtCore import Qt, QDate, QLocale, QCalendar
 from PyQt6.QtGui import QFont
@@ -76,11 +77,85 @@ class ManageWindow(QMainWindow):
         self.guys_table_frame = QFrame()
         self.guys_table_frame.setStyleSheet("background-color: #f5f5f5;")
 
+        # settings frame
+        self.settings_frame = QFrame()
+        self.settings_frame.setStyleSheet("background-color: #f5f5f5;")
+
         # main-frame
         self.content = QFrame()
         self.content.setStyleSheet("background-color: #f5f5f5;")
 
         # __________________widgets___________________
+        self.current_pass = QLineEdit()
+        self.current_pass.setPlaceholderText("رمز فعلی")
+        self.current_pass.setFont(self._font)
+        self.current_pass.setStyleSheet("""
+            QLineEdit{
+                font-size: 18px;
+                padding: 8px;
+                margin-bottom: 50px;
+                margin-top: 20px;
+                border: 2px solid #CACACA;
+                border-radius: 6px;
+                font-weight: bold;
+            }        
+    """)
+
+        self.new_pass = QLineEdit()
+        self.new_pass.setPlaceholderText("رمز جدید")
+        self.new_pass.setFont(self._font)
+        self.new_pass.setStyleSheet("""
+            QLineEdit{
+                font-size: 18px;
+                padding: 8px;
+                margin-bottom: 50px;
+                margin-top: 20px;
+                border: 2px solid #CACACA;
+                border-radius: 6px;
+                font-weight: bold;
+            }        
+    """)
+
+        self.confirm_new_pass = QLineEdit()
+        self.confirm_new_pass.setPlaceholderText("تکرار رمز جدید ")
+        self.confirm_new_pass.setFont(self._font)
+        self.confirm_new_pass.setStyleSheet("""
+            QLineEdit{
+                font-size: 18px;
+                padding: 8px;
+                margin-bottom: 50px;
+                margin-top: 20px;
+                border: 2px solid #CACACA;
+                border-radius: 6px;
+                font-weight: bold;
+            }        
+    """)
+
+        self.confirm_change_pass_btn = QPushButton()
+        self.confirm_change_pass_btn.clicked.connect(self.change_pass_btn_handler)
+        self.confirm_change_pass_btn.setText("تغییر رمز عبور")
+        self.confirm_change_pass_btn.setFont(self._font)
+        self.confirm_change_pass_btn.setFixedHeight(25)
+        self.confirm_change_pass_btn.setCursor(Qt.CursorShape.PointingHandCursor)
+        self.confirm_change_pass_btn.setStyleSheet("""
+        QPushButton{
+            background: #07b813;
+            color: white;
+            font-size: 12px;
+            text-align: center;   
+        }
+        QPushButton:hover{
+            background: #0ecc1b;
+            color: white;
+            font-size: 12px;
+        }
+    """)
+
+
+
+
+
+
         self.filter_btn_emp = QPushButton()
         self.filter_btn_emp.clicked.connect(self.filter_handler)
         self.filter_btn_emp.setText("فیلتر")
@@ -462,8 +537,8 @@ class ManageWindow(QMainWindow):
         self.enter_g_btn.clicked.connect(self.enter_g_btn_handler)
 
 
-        self.info_btn = self.make_vsidebar_btns("گزارشات", "📊")
         self.settings_btn = self.make_vsidebar_btns("تنظیمات", "⚙️")
+        self.settings_btn.clicked.connect(self.settings_handler)
 
 
         self.exit_btn = self.make_vsidebar_btns("خروج", "")
@@ -484,25 +559,28 @@ class ManageWindow(QMainWindow):
         if self.user_name == "admin":
             boss_btn = self.make_vsidebar_btns(
                 f"{self.user_name} :مدیر سیستم", "👨‍💼")
+            
+            self.info_btn = self.make_vsidebar_btns("گزارشات", "📊")
             sidebar_layout.addWidget(boss_btn)
+            sidebar_layout.addWidget(self.enter_e_btn)
+            sidebar_layout.addWidget(self.enter_g_btn)
+            sidebar_layout.addWidget(self.info_btn)
+            sidebar_layout.addWidget(self.settings_btn)
+            sidebar_layout.addStretch()
+            sidebar_layout.addWidget(self.exit_btn)
+            self.vsidebar.setLayout(sidebar_layout)
 
         elif self.user_name == "soldier":
             soldier_btn = self.make_vsidebar_btns(
                 f"{self.user_name} :کاربر سیستم", "👨‍💼")
             sidebar_layout.addWidget(soldier_btn)
+            sidebar_layout.addWidget(self.enter_e_btn)
+            sidebar_layout.addWidget(self.enter_g_btn)
+            sidebar_layout.addWidget(self.settings_btn)
+            sidebar_layout.addStretch()
+            sidebar_layout.addWidget(self.exit_btn)
+            self.vsidebar.setLayout(sidebar_layout)
 
-        sidebar_layout.addWidget(self.enter_e_btn)
-        sidebar_layout.addWidget(self.enter_g_btn)
-        sidebar_layout.addWidget(self.info_btn)
-        sidebar_layout.addWidget(self.settings_btn)
-        sidebar_layout.addStretch()
-        sidebar_layout.addWidget(self.exit_btn)
-        self.vsidebar.setLayout(sidebar_layout)
-
-        self.date_frame.hide()
-        self.table_frame.hide()
-        self.guys_table_frame.hide()
-        self.date_frame_guys.hide()
 
         # hsidebar layout for employee
         self.container_hlayout_date = QHBoxLayout()
@@ -536,18 +614,28 @@ class ManageWindow(QMainWindow):
         self.container_hlayout_guys_table.addWidget(self.table_of_guys)
         self.guys_table_frame.setLayout(self.container_hlayout_guys_table)
 
+        # settings layout
+        self.settings_vlayout = QVBoxLayout()
+        self.settings_vlayout.addWidget(self.current_pass)
+        self.settings_vlayout.addWidget(self.new_pass)
+        self.settings_vlayout.addWidget(self.confirm_new_pass)
+        self.settings_vlayout.addWidget(self.confirm_change_pass_btn)
+        self.settings_frame.setLayout(self.settings_vlayout)
+
         # layout of date and table
         self.content_layout = QVBoxLayout()
         self.content_layout.addWidget(self.date_frame)
         self.content_layout.addWidget(self.date_frame_guys)
         self.content_layout.addWidget(self.table_frame, stretch=1)
         self.content_layout.addWidget(self.guys_table_frame, stretch=1)
+        self.content_layout.addWidget(self.settings_frame, stretch=1)
         self.content_layout.addStretch()
         self.content.setLayout(self.content_layout)
 
         body_layout = QHBoxLayout()
         body_layout.addWidget(self.vsidebar)   # سایدبار سمت چپ
         body_layout.addWidget(self.content)  # محتوای اصلی
+
 
         # --- لایه نهایی (header + body)
         main_layout = QVBoxLayout()
@@ -557,6 +645,12 @@ class ManageWindow(QMainWindow):
         container = QWidget()
         container.setLayout(main_layout)
         self.setCentralWidget(container)  # special when using layout
+
+        self.date_frame.hide()
+        self.table_frame.hide()
+        self.guys_table_frame.hide()
+        self.date_frame_guys.hide()
+        self.settings_frame.hide()
 
         # __________________actions__________________
         self.exit_btn.clicked.connect(self.close_program)
@@ -811,10 +905,12 @@ class ManageWindow(QMainWindow):
         if self.enter_e_btn.isChecked():
 
             self.enter_g_btn.setChecked(False)
-            self.info_btn.setChecked(False)
+            if self.user_name=="Admin":
+                self.info_btn.setChecked(False)
             self.settings_btn.setChecked(False) 
             self.exit_btn.setChecked(False)
 
+            self.settings_frame.hide()
             self.date_frame_guys.hide()
             self.guys_table_frame.hide()
             self.date_frame.show()
@@ -828,10 +924,12 @@ class ManageWindow(QMainWindow):
         if self.enter_g_btn.isChecked():
 
             self.enter_e_btn.setChecked(False)
-            self.info_btn.setChecked(False)
+            if self.user_name=="Admin":
+                self.info_btn.setChecked(False)
             self.settings_btn.setChecked(False) 
             self.exit_btn.setChecked(False)
 
+            self.settings_frame.hide()
             self.table_frame.hide()
             self.date_frame.hide()
             self.date_frame_guys.show()
@@ -842,5 +940,26 @@ class ManageWindow(QMainWindow):
             self.guys_table_frame.hide()
     
 
+    def settings_handler(self):
+        if self.settings_btn.isChecked():
+            self.enter_e_btn.setChecked(False)
+            self.enter_g_btn.setChecked(False)
+            self.exit_btn.setChecked(False)
+            if self.user_name=="Admin":
+                self.info_btn.setChecked(False) 
+            
+            self.table_frame.hide()
+            self.date_frame.hide()
+            self.date_frame_guys.hide()
+            self.guys_table_frame.hide()
+            self.settings_frame.show()
+        else:
+            self.settings_frame.hide()
+
+
     def filter_handler(self):
         self.filter_window = FilterWindow()
+
+
+    def change_pass_btn_handler(self):
+        pass

@@ -43,6 +43,7 @@ class FilterWindow(QDialog):
         # btns
         self.filter_btn = QPushButton()
         self.filter_btn.setFont(self._font)
+        self.filter_btn.clicked.connect(self.filter_btn_handler)
         self.filter_btn.setText("فیلتر کردن")
         self.filter_btn.setCursor(Qt.CursorShape.PointingHandCursor)
         self.filter_btn.setStyleSheet("""
@@ -59,8 +60,7 @@ class FilterWindow(QDialog):
         }
     """)
 
-       
-
+    
         # inputs
         self.name_input = QLineEdit()
         self.name_input.setPlaceholderText('نام')
@@ -88,11 +88,26 @@ class FilterWindow(QDialog):
                 font-weight: bold;
             }        
     """)
+        # inputs
+        self.year_input = QLineEdit()
+        self.year_input.setPlaceholderText('سال مورد نظر')
+        self.year_input.setStyleSheet("""
+            QLineEdit{
+                font-size: 18px;
+                padding: 8px;
+                margin-bottom: 50px;
+                margin-top: 20px;
+                border: 2px solid #CACACA;
+                border-radius: 6px;
+                font-weight: bold;
+            }        
+    """)
 
         # layout
         self.vlayout_input = QVBoxLayout()
         self.vlayout_input.addWidget(self.name_input)
         self.vlayout_input.addWidget(self.last_name_input)
+        self.vlayout_input.addWidget(self.year_input)
         self.vlayout_input.addWidget(self.notice_text)
         self.vlayout_input.addStretch()
         self.vframe.setLayout(self.vlayout_input)
@@ -108,3 +123,6 @@ class FilterWindow(QDialog):
         # different with QMainwindow we dont have setCentralWidget()
         self.setLayout(self.vlayout_main)
 
+
+    def filter_btn_handler(self):
+        pass
