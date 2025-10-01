@@ -18,7 +18,7 @@ from utils.persian_datetime import (persian_date,
                                     convert_calender_to_persian as cp
                                     )
 from utils.mention_of_day import find_mention_of_the_day
-from utils.persian_datetime import convert_slash_to_dash
+from utils.persian_datetime import convert_slash_to_dash, normalize_time
 from src.crud_employee_window import UserCrud
 from services.users_employees_operations import (get_employees_by_date,
                                                  get_employees,
@@ -360,8 +360,8 @@ class ManageWindow(QMainWindow):
                 'تاریخ',
                 'زمان ورود',
                 'زمان خروج',
-                'جنسیت',
                 'مراجعه به',
+                'جنسیت',
                 'آیا نظامی است؟',
                 'درجه',
                 'بخش/سازمان',
@@ -579,12 +579,12 @@ class ManageWindow(QMainWindow):
                 self.table.setItem(i, 1, QTableWidgetItem(emp.last_name))
                 self.table.setItem(i, 2, QTableWidgetItem(emp.badge))
                 self.table.setItem(i, 3, QTableWidgetItem(convert_slash_to_dash(self.date_edit.text())))
-                self.table.setItem(i, 4, QTableWidgetItem(str(empinfo.entrance_time)))
-                self.table.setItem(i, 5, QTableWidgetItem(str(empinfo.exit_time)))
+                self.table.setItem(i, 4, QTableWidgetItem(str(normalize_time(empinfo.entrance_time))))
+                self.table.setItem(i, 5, QTableWidgetItem(str(normalize_time(empinfo.exit_time))))
                 self.table.setItem(i, 6, QTableWidgetItem(str(empinfo.is_released)))
                 self.table.setItem(i, 7, QTableWidgetItem(empinfo.reseaon_of_releasing))
                 self.table.setItem(i, 8, QTableWidgetItem(empinfo.mission_kind))
-                self.table.setItem(i, 9, QTableWidgetItem(str(empinfo.mission_time)))
+                self.table.setItem(i, 9, QTableWidgetItem(str(empinfo.mission_time if empinfo.mission_time else "")))
                 self.table.setItem(i, 10, QTableWidgetItem(str(empinfo.overtime_work))) # can not show in float
 
         else:
@@ -668,17 +668,17 @@ class ManageWindow(QMainWindow):
                 self.table_of_guys.insertRow(i)
                 self.table_of_guys.setItem(i, 0, QTableWidgetItem(guy.first_name))
                 self.table_of_guys.setItem(i, 1, QTableWidgetItem(guy.last_name))
-                self.table_of_guys.setItem(i, 2, QTableWidgetItem(guy.))
-                self.table_of_guys.setItem(i, 3, QTableWidgetItem(convert_slash_to_dash(self.date_edit_guys.text())))
-                self.table_of_guys.setItem(i, 4, QTableWidgetItem(guy[4]))
-                self.table_of_guys.setItem(i, 5, QTableWidgetItem(guy[5]))
-                self.table_of_guys.setItem(i, 6, QTableWidgetItem(guy[6]))
-                self.table_of_guys.setItem(i, 7, QTableWidgetItem(guy[7]))
-                self.table_of_guys.setItem(i, 8, QTableWidgetItem(guy[8]))
-                self.table_of_guys.setItem(i, 9, QTableWidgetItem(guy[9]))
+                self.table_of_guys.setItem(i, 2, QTableWidgetItem(convert_slash_to_dash(self.date_edit_guys.text())))
+                self.table_of_guys.setItem(i, 3, QTableWidgetItem(str(normalize_time(guy.entrance_time))))
+                self.table_of_guys.setItem(i, 4, QTableWidgetItem(str(normalize_time(guy.exit_time))))
+                self.table_of_guys.setItem(i, 5, QTableWidgetItem(guy.work_with))
+                self.table_of_guys.setItem(i, 6, QTableWidgetItem(guy.gender))
+                self.table_of_guys.setItem(i, 7, QTableWidgetItem(guy.is_military))
+                self.table_of_guys.setItem(i, 8, QTableWidgetItem(guy.badge))
+                self.table_of_guys.setItem(i, 9, QTableWidgetItem(guy.organization))
 
         else:
-            _filter = range(40) # default rows to be filled out
+            _filter = range(30) # default rows to be filled out
             print(_filter)
             self.table_of_guys.setRowCount(0)
             for i, guy in enumerate(_filter):
@@ -714,33 +714,38 @@ class ManageWindow(QMainWindow):
 
         if _filter:
             for _, _data in data.items():
-                admit_table_guys_updates(
-                    first_name=_data[0],
-                    last_name=_data[1],
-                    date=JalaliDate.fromisoformat(_data[2]).to_gregorian(),
-                    entrance_time=JalaliDateTime.strptime(_data[3],"%H:%M").time(),
-                    exit_time=JalaliDateTime.strptime(_data[4],"%H:%M").time(),
-                    work_with=_data[5],
-                    gender=_data[6],
-                    is_military=_data[7],
-                    badge=_data[8],
-                    organization=_data[9]
-                )
+                if _data[0] and _data[1] and _data[3] and _data[4] and _data[6]:
+                    admit_table_guys_updates(
+                        first_name=_data[0],
+                        last_name=_data[1],
+                        date=JalaliDate.fromisoformat(_data[2]).to_gregorian(),
+                        entrance_time=JalaliDateTime.strptime(_data[3],"%H:%M").time(),
+                        exit_time=JalaliDateTime.strptime(_data[4],"%H:%M").time(),
+                        work_with=_data[5],
+                        gender=_data[6],
+                        is_military=_data[7],
+                        badge=_data[8],
+                        organization=_data[9]
+                    )
+                else:
+                    continue
         else:
             for _, _data in data.items():
-                admit_table_guys_changes(
-                    first_name=_data[0],
-                    last_name=_data[1],
-                    date=JalaliDate.fromisoformat(_data[2]).to_gregorian(),
-                    entrance_time=JalaliDateTime.strptime(_data[3],"%H:%M").time(),
-                    exit_time=JalaliDateTime.strptime(_data[4],"%H:%M").time(),
-                    work_with=_data[5],
-                    gender=_data[6],
-                    is_military=_data[7],
-                    badge=_data[8],
-                    organization=_data[9]
-                )
-
+                if _data[0] and _data[1] and _data[3] and _data[4] and _data[6]:
+                    admit_table_guys_changes(
+                        first_name=_data[0],
+                        last_name=_data[1],
+                        date=JalaliDate.fromisoformat(_data[2]).to_gregorian(),
+                        entrance_time=JalaliDateTime.strptime(_data[3],"%H:%M").time(),
+                        exit_time=JalaliDateTime.strptime(_data[4],"%H:%M").time(),
+                        work_with=_data[5],
+                        gender=_data[6],
+                        is_military=_data[7],
+                        badge=_data[8],
+                        organization=_data[9]
+                    )
+                else:
+                    continue
 
 
     def enter_e_btn_handler(self):

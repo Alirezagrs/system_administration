@@ -46,17 +46,17 @@ def admit_table_guys_updates(first_name,last_name,date,entrance_time,
                 )
             )
         )
-        result = guys.all()
+        result = guys.scalars().all()
         for guy in result:
-            guy.first_name=first_name,
-            guy.flast_name=last_name,
-            guy.fdate=date,
-            guy.fentrance_time=entrance_time,
-            guy.fexit_time=exit_time,
-            guy.fwork_with=work_with,
-            guy.fgender=gender,
-            guy.fis_military=is_military,
-            guy.fbadge=badge,
-            guy.forganization=organization,
+            guy.first_name=first_name
+            guy.last_name=last_name
+            guy.date=date
+            guy.entrance_time=entrance_time
+            guy.exit_time=exit_time
+            guy.work_with=work_with
+            guy.gender=gender
+            guy.is_military=is_military
+            guy.badge=badge
+            guy.organization=organization
         
         session.commit()
