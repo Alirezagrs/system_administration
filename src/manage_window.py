@@ -21,7 +21,7 @@ from utils.persian_datetime import (persian_date,
 from utils.mention_of_day import find_mention_of_the_day
 from utils.persian_datetime import convert_slash_to_dash, normalize_time
 from src.crud_employee_window import UserCrud
-from src.filter_window import FilterWindow
+from src.performance_window import FilterWindow
 from services.users_employees_operations import (get_employees_by_date,
                                                  get_employees,
                                                  admit_table_changes,
@@ -157,7 +157,7 @@ class ManageWindow(QMainWindow):
 
         self.filter_btn_emp = QPushButton()
         self.filter_btn_emp.clicked.connect(self.filter_handler)
-        self.filter_btn_emp.setText("فیلتر")
+        self.filter_btn_emp.setText("گزارش عملکرد کارمندان")
         self.filter_btn_emp.setFont(self._font)
         self.filter_btn_emp.setFixedHeight(25)
         self.filter_btn_emp.setCursor(Qt.CursorShape.PointingHandCursor)

@@ -1,6 +1,6 @@
 from datetime import date
 
-from sqlalchemy import and_, select, delete, update
+from sqlalchemy import and_, select, delete, func, case, extract
 
 from db.config import create_session
 from db.models import Users, Employees, EInfo
@@ -194,5 +194,27 @@ def change_password_operations(current_pass, new_pass, confirm_new_pass, user_na
 
 
 
-def filter_employee_with_features():
-    pass
+def employees_performance_report():
+
+    query = (
+    select(
+        Employees.id.label("employee_id"),
+        Employees.first_name,
+        Employees.last_name,
+        extract("year", EInfo.date).label("year"),
+        extract("month", EInfo.date).label("month"),
+        func.sum(EInfo.overtime_work).label("total_overtime"),
+        func.sum(EInfo.mission_time).label("total_mission_hours"),
+        func.count(case((EInfo.is_released == "بله", 1))).label("total_released_days"),
+    )
+    .join(Employees, Employees.id == EInfo.employee_id)
+    .group_by(Employees.id, Employees.first_name, Employees.last_name, "year", "month")
+    .order_by(Employees.id, "year", "month")
+)
+
+
+    with create_session() as session:
+        results = session.execute(query).all()
+
+    return results
+    

@@ -41,7 +41,7 @@ class EInfo(Base):
     is_released: Mapped[str] = mapped_column(String(30), default="خیر")
     reseaon_of_releasing: Mapped[str] = mapped_column(nullable=True)
     mission_kind: Mapped[str] = mapped_column(nullable=True)
-    mission_time: Mapped[time] = mapped_column(Time, nullable=True)
+    mission_time: Mapped[float] = mapped_column(nullable=True)
     overtime_work: Mapped[float] = mapped_column(nullable=True)
 
     employee_id: Mapped[int] = mapped_column(
